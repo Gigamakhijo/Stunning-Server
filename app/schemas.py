@@ -1,35 +1,10 @@
-from pydantic import BaseModel
+from sqlalchemy import Column, Integer, String
+from .database import Base
 
 
-class ItemBase(BaseModel):
-    title: str
-    description: str | None = None
+class User(Base):
+    __tablename__ = "users"
 
-
-class ItemCreate(ItemBase):
-    pass
-
-
-class Item(ItemBase):
-    id: int
-    owner_id: int
-
-    class Config:
-        orm_mode = True
-
-
-class UserBase(BaseModel):
-    email: str
-
-
-class UserCreate(UserBase):
-    password: str
-
-
-class User(UserBase):
-    id: int
-    is_active: bool
-    items: list[Item] = []
-
-    class Config:
-        orm_mode = True
+    user_id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
