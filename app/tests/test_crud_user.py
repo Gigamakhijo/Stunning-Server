@@ -23,8 +23,10 @@ def test_create_user():
 
 def test_get_user():
     db = next(get_db())
-    email = "leewoorim@naver.com"
+    email = utils.randomword(10)
+    body = {"email": email, "password": "leewoorim"}
 
+    user.create_user(db,body)
     response = user.get_user(db,email)
 
     assert response.email == email
