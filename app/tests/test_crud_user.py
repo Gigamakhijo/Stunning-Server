@@ -15,18 +15,22 @@ def get_db():
 def test_create_user():
     db = next(get_db())
     email = utils.randomword(10)
-    body = {"email": email, "password": "leewoorim"}
+    password = utils.randomword(10)
+    body = {"email": email, "password": password }
 
     response = user.create_user(db,body)
 
-    response.state_message == 200
+    # response = dict
+    assert response.email == email  
 
 def test_get_user():
     db = next(get_db())
     email = utils.randomword(10)
-    body = {"email": email, "password": "leewoorim"}
+    password = utils.randomword(10)
+    body = {"email": email, "password":password }
 
     user.create_user(db,body)
     response = user.get_user(db,email)
 
+    # response = object
     assert response.email == email
