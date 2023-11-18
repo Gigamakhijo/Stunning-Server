@@ -4,17 +4,15 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-class Login(BaseModel):
+class User(BaseModel):
     email: str
     password: str
 
     class Config():
         from_attributes: True
 
-class User(BaseModel):
+class Profile(BaseModel):
     email: str
-    hashed_password: str
-
-    class Config():
-        from_attributes: True
-
+    username: str
+    gender: int
+    phone_number: str
