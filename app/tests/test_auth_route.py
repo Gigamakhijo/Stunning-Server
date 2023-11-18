@@ -1,27 +1,53 @@
 from fastapi.testclient import TestClient
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
-from .. import oauth2, schemas
+from .. import crud, schemas
+from ..database import Base, get_db
 from ..main import app
-from ..routers.auth import get_current_user
 
-email = "test@example.com"
-password = "test_password"
+SQLALCHEMY_DATABASE_URL = "sqlite://"
 
-
-def override_get_current_user():
-    return schemas.UserAuth(
-        email=email,
-        hashed_password=oauth2.get_password_hash(password),
-    )
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-app.dependency_overrides[get_current_user] = override_get_current_user
+Base.metadata.create_all(bind=engine)
+
+
+def override_get_db():
+    try:
+        db = TestingSessionLocal()
+        yield db
+    finally:
+        db.close()
+
+
+app.dependency_overrides[get_db] = override_get_db
 
 
 client = TestClient(app)
 
 
+email = "test@example.com"
+password = "test_password"
+
+
 def test_token_success():
+    response = client.post(
+        "/users/",
+        json={
+            "email": email,
+            "password": password,
+        },
+    )
+    assert response.status_code == 200, response.text
+
     response = client.post(
         "/auth/token", data={"username": email, "password": password}
     )

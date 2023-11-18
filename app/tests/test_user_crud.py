@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from .. import crud, oauth2, schemas
+from .. import crud, schemas
 from ..database import Base
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
@@ -44,12 +44,11 @@ def test_create_user(email, password):
         db,
         schemas.UserCreate(
             email="hi",
-            hashed_password=password + "fake_hash",
+            password=password,
         ),
     )
 
     assert response.email == "hi"
-    assert response.hashed_password == password + "fake_hash"
 
 
 def test_get_user(email, password):
@@ -61,11 +60,10 @@ def test_get_user(email, password):
         db,
         schemas.UserCreate(
             email=email,
-            hashed_password=password,
+            password=password,
         ),
     )
 
     user = crud.get_user_by_email(db, email)
 
     assert user.email == email
-    assert user.hashed_password == password

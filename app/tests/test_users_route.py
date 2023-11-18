@@ -32,8 +32,7 @@ app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
-email = "test@example.com"
-hashed_password = oauth2.get_password_hash("test_password")
+email = "test_2@example.com"
 
 
 def test_create_user_success():
@@ -41,11 +40,18 @@ def test_create_user_success():
         "/users/",
         json={
             "email": email,
-            "hashed_password": hashed_password,
+            "password": "test_password",
         },
     )
 
-    assert response.status_code == 200
+    assert response.status_code == 200, response.text
+
+    data = response.json()
+    assert data["email"] == email
+
+    db = next(override_get_db())
+    user = crud.get_user_by_email(db, email)
+    assert oauth2.verify_password("test_password", user.hashed_password)
 
 
 def test_create_user_fail():
@@ -55,7 +61,7 @@ def test_create_user_fail():
         db,
         schemas.UserCreate(
             email=email + "a",
-            hashed_password=hashed_password,
+            password="test_password",
         ),
     )
 
@@ -63,8 +69,8 @@ def test_create_user_fail():
         "/users/",
         json={
             "email": email + "a",
-            "hashed_password": hashed_password,
+            "password": "test_password",
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 400, response.text

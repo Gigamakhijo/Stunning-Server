@@ -19,7 +19,7 @@ class UserAuth(UserBase):
 
 
 class UserCreate(UserBase):
-    hashed_password: str
+    password: str
 
 
 class UserGet(UserBase):
@@ -29,3 +29,6 @@ class UserGet(UserBase):
     gender: str | None = None
     phone_number: str | None = None
     status_message: str | None = None
+
+    class Config:
+        orm_mode = True
