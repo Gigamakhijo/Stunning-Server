@@ -3,7 +3,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from .. import crud, schemas
 from ..database import Base, get_db
 from ..main import app
 
@@ -46,7 +45,7 @@ def test_token_success():
             "password": password,
         },
     )
-    assert response.status_code == 200, response.text
+    assert response.status_code == 201, response.text
 
     response = client.post(
         "/auth/token", data={"username": email, "password": password}

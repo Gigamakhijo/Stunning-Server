@@ -44,7 +44,7 @@ def test_create_user_success():
         },
     )
 
-    assert response.status_code == 200, response.text
+    assert response.status_code == 201, response.text
 
     data = response.json()
     assert data["email"] == email
