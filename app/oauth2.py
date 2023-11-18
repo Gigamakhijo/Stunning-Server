@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
-from passlib.context import CryptContext
+
 from jose import jwt
+from passlib.context import CryptContext
 
 from . import schemas
 
@@ -21,12 +22,12 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def authenticate_user(user: schemas.User, username: str, password: str):
+def authenticate_user(user: schemas.UserCreate, email: str, password: str):
     if not user:
         return None
     if not verify_password(password, user.hashed_password):
         return None
-    if user.username != username:
+    if user.email != email:
         return None
     return user
 

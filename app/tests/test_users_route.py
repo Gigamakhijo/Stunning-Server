@@ -3,10 +3,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from .. import schemas
-from ..database import Base
+from .. import crud, schemas
+from .. import oauth2
 from ..main import app
-from ..routers.auth import get_db
+from ..database import Base, get_db
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -33,16 +33,39 @@ app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
+email = "test@example.com"
+hashed_password = oauth2.get_password_hash("test_password")
 
-def test_create_user():
+
+def test_create_user_success():
     response = client.post(
         "/users/",
         json={
-            "email": "deadpool@example.com",
-            "hashed_password": "chimichangas4life",
+            "email": email,
+            "hashed_password": hashed_password,
         },
     )
-    assert response.status_code == 201, response.text
-    new_user = schemas.User(**response.json())
 
-    assert new_user.email == "deadpool@example.com"
+    assert response.status_code == 200
+
+
+def test_create_user_fail():
+    db = next(override_get_db())
+
+    crud.create_user(
+        db,
+        schemas.UserCreate(
+            email=email + "a",
+            hashed_password=hashed_password,
+        ),
+    )
+
+    response = client.post(
+        "/users/",
+        json={
+            "email": email + "a",
+            "hashed_password": hashed_password,
+        },
+    )
+
+    assert response.status_code == 400

@@ -7,18 +7,25 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    username: str | None = None
-
-
-class User(BaseModel):
-    id: int | None = None
-    username: str
     email: str | None = None
+
+
+class UserBase(BaseModel):
+    email: str
+
+
+class UserAuth(UserBase):
+    hashed_password: str
+
+
+class UserCreate(UserBase):
+    hashed_password: str
+
+
+class UserGet(UserBase):
+    id: int
+    username: str | None = None
     full_name: str | None = None
-    gender: int | None = None
+    gender: str | None = None
     phone_number: str | None = None
     status_message: str | None = None
-
-
-class UserInDB(User):
-    hashed_password: str

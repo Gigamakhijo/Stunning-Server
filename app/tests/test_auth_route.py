@@ -1,18 +1,16 @@
 from fastapi.testclient import TestClient
 
-from .. import schemas
+from .. import oauth2, schemas
 from ..main import app
 from ..routers.auth import get_current_user
-from .. import oauth2
-
 
 email = "test@example.com"
 password = "test_password"
 
 
 def override_get_current_user():
-    return schemas.UserInDB(
-        username=email,
+    return schemas.UserAuth(
+        email=email,
         hashed_password=oauth2.get_password_hash(password),
     )
 
