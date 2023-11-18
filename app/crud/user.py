@@ -1,25 +1,28 @@
 from sqlalchemy.orm import Session
+
+from .. import models
 from .. import schemas
-from ..models import users
-from ..crud import user
 
 
-def get_user(db: Session, email: str):
-    return db.query(schemas.User).filter(schemas.User.email == email).first()
-
-
-def create_user(db: Session, user: users.Login):
-    hashed__password = auth.get_password_hash(user.get("password"))
-
-    db_user = schemas.User(email=user.get("email"), hashed_password=hashed__password)
+def create_user(db: Session, user: schemas.User):
+    db_user = schemas.User(
+        email=user.email,
+        gender=user.gender,
+        phone_number=user.phone_number,
+        status_message=user.status_message,
+        hashed_password=user.hashed_password,
+    )
 
     db.add(db_user)
     db.commit()
-
     db.refresh(db_user)
 
     return db_user
 
 
-def set_profile(db: Session, form: users.Profile):
-    ...
+def get_user(db: Session, user_id: int):
+    return db.query(models.User).filter(schemas.User.id == user_id).first()
+
+
+def get_user_by_email(db: Session, email: str):
+    return db.query(models.User).filter(models.User.email == email).first()
