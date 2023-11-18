@@ -21,7 +21,7 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-def authenticate_user(user: schemas.User, username: str, password: str):
+def authenticate_user(user: schemas.UserInDB, username: str, password: str):
     if not user:
         return None
     if not verify_password(password, user.hashed_password):

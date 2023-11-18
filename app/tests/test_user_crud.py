@@ -4,7 +4,8 @@ from sqlalchemy.pool import StaticPool
 import pytest
 
 from ..crud import user
-from ...database import Base
+from ..database import Base
+
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -48,9 +49,6 @@ def test_create_user(email, password):
 
 def test_get_user(email, password):
     db = override_get_db()
-
-    body = {"email": email, "password": password}
-    user.create_user(db, body)
 
     response = user.get_user(db, email)
 

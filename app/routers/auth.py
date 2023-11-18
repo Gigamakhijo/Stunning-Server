@@ -4,7 +4,7 @@ from typing import Annotated
 from sqlalchemy.orm import Session
 from fastapi import Depends, APIRouter, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
+from jose import JWTError
 
 
 from .. import crud

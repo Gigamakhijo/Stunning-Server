@@ -1,6 +1,6 @@
-from fastapi.testclient import testclient
+from fastapi.testclient import TestClient
 
-from .. import routers
+from ..routers import users 
 from ..main import app
 
 from .. import schemas
@@ -8,18 +8,13 @@ from .. import schemas
 
 def mock_create_user():
     return schemas.user(
-        id=1,
-        username="test_user",
-        email="test_user@test.com",
-        gender="female",
-        phone_number=123456789,
-        status_message="sldkfjalskfjalksdjfkajsdklfjasdkf",
+        email="test_user@test.com"
     )
 
 
-app.dependency_overrides[routers.users.create_user] = mock_create_user
+app.dependency_overrides[users.create_user] = mock_create_user
 
-client = testclient(app)
+client = TestClient(app)
 
 
 def test_signup_success():

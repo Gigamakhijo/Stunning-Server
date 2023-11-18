@@ -33,16 +33,18 @@ app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
-
 def test_create_user():
     response = client.post(
         "/users/",
         json={
+            "id" : 1,
             "email": "deadpool@example.com",
+            "username": "test",
             "hashed_password": "chimichangas4life",
         },
     )
-    assert response.status_code == 201, response.text
+    
+    assert response == 200, response.text
     new_user = schemas.User(**response.json())
 
     assert new_user.email == "deadpool@example.com"
