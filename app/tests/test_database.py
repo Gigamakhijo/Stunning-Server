@@ -6,6 +6,7 @@ from sqlalchemy.pool import StaticPool
 from ..database import Base
 from ..routers.auth import get_db
 from ..main import app
+from .. import schemas
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -36,8 +37,12 @@ client = TestClient(app)
 def test_create_user():
     response = client.post(
         "/users/",
-        json={"email": "deadpool@example.com", "hashed_password": "chimichangas4life"},
+        json={
+            "email": "deadpool@example.com",
+            "hashed_password": "chimichangas4life",
+        },
     )
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert data["email"] == "deadpool@example.com"
+    assert response.status_code == 201, response.text
+    new_user = schemas.User(**response.json())
+
+    assert new_user.email == "deadpool@example.com"
