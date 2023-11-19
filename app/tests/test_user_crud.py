@@ -1,10 +1,10 @@
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
-import pytest
 
-from ..crud import user
-from ...database import Base
+from .. import crud, schemas
+from ..database import Base
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -38,20 +38,32 @@ def password():
 
 
 def test_create_user(email, password):
-    db = override_get_db()
+    db = next(override_get_db())
 
-    body = {"email": email, "password": password}
-    response = user.create_user(db, body)
+    response = crud.create_user(
+        db,
+        schemas.UserCreate(
+            email="hi",
+            password=password,
+        ),
+    )
 
-    assert response.email == email
+    assert response.email == "hi"
 
 
 def test_get_user(email, password):
-    db = override_get_db()
+    db = next(override_get_db())
 
-    body = {"email": email, "password": password}
-    user.create_user(db, body)
+    email = email + "a"
 
-    response = user.get_user(db, email)
+    crud.create_user(
+        db,
+        schemas.UserCreate(
+            email=email,
+            password=password,
+        ),
+    )
 
-    assert response.email == email
+    user = crud.get_user_by_email(db, email)
+
+    assert user.email == email
