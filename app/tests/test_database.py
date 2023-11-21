@@ -37,6 +37,7 @@ def test_create_user():
     response = client.post(
         "/users/",
         json={
+            "id": 1,
             "email": "deadpool@example.com",
             "password": "chimichangas4life",
         },
