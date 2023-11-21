@@ -31,4 +31,4 @@ class UserGet(UserBase):
     status_message: str | None = None
 
     class Config:
-        orm_mode = True
+        from_attribues = True
