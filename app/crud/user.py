@@ -1,14 +1,12 @@
 from sqlalchemy.orm import Session
 
-from .. import models
-from .. import schemas
+from .. import models, oauth2, schemas
 
 
-def create_user(db: Session, user: schemas.UserInDB):
-    db = next(db)
+def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(
-        email=user.get("email"),
-        hashed_password=user.get("hashed_password"),
+        email=user.email,
+        hashed_password=oauth2.get_password_hash(user.password),
     )
 
     db.add(db_user)
@@ -18,6 +16,9 @@ def create_user(db: Session, user: schemas.UserInDB):
     return db_user
 
 
-def get_user(db: Session, email: str):
-    db = next(db)
+def get_user(db: Session, user_id: int):
+    return db.query(models.User).filter(models.User.id == user_id).first()
+
+
+def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.email == email).first()

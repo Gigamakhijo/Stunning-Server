@@ -4,9 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from ..database import Base
-from ..routers.auth import get_db
 from ..main import app
-from .. import schemas
+from ..routers.auth import get_db
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -33,18 +32,37 @@ app.dependency_overrides[get_db] = override_get_db
 
 client = TestClient(app)
 
+
 def test_create_user():
     response = client.post(
         "/users/",
         json={
-            "id" : 1,
+            "id": 1,
             "email": "deadpool@example.com",
-            "username": "test",
-            "hashed_password": "chimichangas4life",
+            "password": "chimichangas4life",
         },
     )
-    
-    assert response == 200, response.text
-    new_user = schemas.User(**response.json())
+    assert response.status_code == 201, response.text
+    data = response.json()
+    assert data["email"] == "deadpool@example.com"
+    assert "id" in data
+    user_id = data["id"]
 
-    assert new_user.email == "deadpool@example.com"
+    response = client.post(
+        "/auth/token",
+        data={
+            "username": "deadpool@example.com",
+            "password": "chimichangas4life",
+        },
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+
+    response = client.get(
+        "/users/me",
+        headers={"Authorization": f"{data['token_type']} {data['access_token']}"},
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data["email"] == "deadpool@example.com"
+    assert data["id"] == user_id
