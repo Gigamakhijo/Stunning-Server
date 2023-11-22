@@ -32,32 +32,38 @@ def test_add_todo():
     response = crud.add_todo(
         db,
         schemas.Todo(
-            date = "11111111",
-            icon = "iconname",
+            date="1",
+            icon="iconname",
             title="title_",
             contents="content_",
             color="#FFFFFF",
             done=False,
-        )
+        ),
     )
-    
+
     assert response.icon == "iconname"
 
+
 def test_get_todolist():
-    db=next(override_get_db())
+    db = next(override_get_db())
 
     response = crud.add_todo(
         db,
         schemas.Todo(
-            date = "11111111",
-            icon = "iconname",
+            date="1",
+            icon="iconname",
             title="title_",
             contents="content_",
             color="#FFFFFF",
             done=False,
-        )
+        ),
     )
-    
-    assert response.icon == "iconname"
-     
+
+    date = response.date
+
+    response = crud.get_todolist(db, date=date)
+
+    assert response[0].date == date
+    assert response[0].icon == "iconname"
+    assert response[0].title == "title_"
     ...
