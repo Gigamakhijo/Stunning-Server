@@ -5,7 +5,10 @@ from pydantic import BaseModel
 
 
 class TodoBase(BaseModel):
-    date: datetime
+    user_id: int
+
+
+class TodoGet(TodoBase):
     icon: str
     title: str
     contents: str
@@ -14,12 +17,13 @@ class TodoBase(BaseModel):
 
 
 class TodoCreate(TodoBase):
-    user_id: int
+    date: datetime | None = None
+    icon: str
+    title: str
+    contents: str
+    color: str
+    done: bool
 
 
 class TodoListGet(BaseModel):
-    date: str
-
-
-class TodoList(TodoListGet):
-    todolist: List[TodoBase]
+    todolist: List[TodoGet]

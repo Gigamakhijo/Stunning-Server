@@ -1,69 +1,48 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
+import datetime
 
 from .. import crud, schemas
-from ..database import Base
-
-SQLALCHEMY_DATABASE_URL = "sqlite://"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-Base.metadata.create_all(bind=engine)
+def test_add_todo(session, test_user):
+    date = datetime.datetime(2023, 11, 23, 17, 24, 10)
 
+    todo_data = {
+        "dat": date,
+        "icon": "iconname",
+        "title": "title_",
+        "contents": "content_",
+        "color": "#FFFFFF",
+        "done": False,
+        "user_id": test_user["id"],
+    }
 
-def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
+    print(date)
 
-
-def test_add_todo():
-    db = next(override_get_db())
-
-    response = crud.add_todo(
-        db,
+    response = crud.create_todo(
+        session,
         schemas.TodoCreate(
-            date="1",
+            date=date,
             icon="iconname",
             title="title_",
             contents="content_",
             color="#FFFFFF",
             done=False,
-            user_id=1,
+            user_id=test_user["id"],
         ),
     )
 
     assert response.icon == "iconname"
 
 
-def test_get_todos():
-    db = next(override_get_db())
-
-    response = crud.add_todo(
-        db,
-        schemas.TodoCreate(
-            date="1",
-            icon="iconname",
-            title="title_",
-            contents="content_",
-            color="#FFFFFF",
-            done=False,
-            user_id=1,
+def test_get_todos(session, test_user, todos):
+    response = crud.get_todos_by_date(
+        session,
+        date=datetime.date(
+            2023,
         ),
+        skip=1,
+        limit=3,
     )
-
-    date = response.date
-
-    response = crud.get_todolist(db, date=date)
 
     assert response[0].date == date
     assert response[0].icon == "iconname"

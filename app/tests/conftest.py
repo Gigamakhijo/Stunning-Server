@@ -1,9 +1,12 @@
+import datetime
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
+from .. import crud, oauth2, schemas
 from ..database import Base, get_db
 from ..main import app
 
@@ -67,9 +70,53 @@ def test_user(client, email, password):
     body = {"email": email, "password": password}
 
     response = client.post("/users/", json=body)
-    assert response.status_code == 201
+    assert response.status_code == 201, response.text
     data = response.json()
     assert data["email"] == body["email"]
     data["password"] = body["password"]
 
     return data
+
+
+@pytest.fixture()
+def authenticated_user(client, test_user):
+    response = client.post(
+        "/auth/token",
+        data={"email": test_user["email"], "password": test_user["password"]},
+    )
+
+    assert response.status_code == 201, response.text
+
+
+@pytest.fixture
+def test_todos(test_user, session):
+    todos = []
+    for t in range(10):
+        todo = crud.create_todo(
+            session,
+            schemas.TodoCreate(
+                date=datetime.datetime(2023, 11, 23, t, 24, 10),
+                icon="iconname",
+                title=f"title_{t}",
+                contents=f"content_{t}",
+                color="#FFFFFF",
+                done=False,
+                user_id=test_user["id"],
+            ),
+        )
+
+        todos.append(todo)
+
+    return todos
+
+
+@pytest.fixture
+def token(test_user):
+    return oauth2.create_access_token({"sub": test_user["email"]})
+
+
+@pytest.fixture
+def authorized_client(client, token):
+    client.headers = {**client.headers, "Authorization": f"Bearer {token}"}
+
+    return client
