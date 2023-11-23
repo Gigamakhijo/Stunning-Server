@@ -1,79 +1,30 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
-from .. import crud, schemas
-from ..database import Base
 import datetime
 
-SQLALCHEMY_DATABASE_URL = "sqlite://"
+from .. import crud, schemas
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-Base.metadata.create_all(bind=engine)
 
 def test_create_todo(session):
-    db = session
-
-    response = crud.create_todo(
-        db,
-        schemas.TodoCreate(
-            user_id=1,
-            date= datetime.datetime(2023,11,24,1,45),
-            icon="iconname",
-            title="title_",
-            contents="content_",
-            color="#FFFFFF",
-            done=False,
-        ),
+    todo_create = schemas.TodoCreate(
+        user_id=1,
+        date=datetime.datetime(2023, 11, 24, 1, 45),
+        icon="iconname",
+        title="title_",
+        contents="content_",
+        color="#FFFFFF",
+        done=False,
     )
 
-    assert response.icon == "iconname"
+    todo = crud.create_todo(session, todo_create)
+
+    for k in ["user_id", "icon", "title", "contents", "color", "done"]:
+        assert getattr(todo, k) == getattr(todo_create, k)
 
 
-def test_get_todolist(session):
-    db = session
+def test_get_todolist(session, test_todos):
+    date = test_todos[0].date
 
-    response = crud.create_todo(
-        db,
-        schemas.TodoCreate(
-            user_id=1,
-            date= datetime.datetime(2023,11,24,1,45),
-            icon="iconname",
-            title="title_",
-            contents="content_",
-            color="#FFFFFF",
-            done=False,
-        ),
-    )
-    
-    crud.create_todo(
-        db,
-        schemas.TodoCreate(
-            user_id=1,
-            date=datetime.datetime(2023,11,25,1,45),
-            icon="iconname",
-            title="title",
-            contents="content",
-            color="#FFFFFF",
-            done=False,
-        ),
-    )
+    response = crud.get_todos_by_date(session, date=date, skip=0, limit=2)
 
-    date = response.date
-
-    response = crud.get_todos_by_date(db, date=date)
-
-    assert len(response) == 1
-    assert response[0].date == date
-    assert response[0].icon == "iconname"
-    assert response[0].title == "title_"
-
-
-    ...
+    for val, exp in zip(response, test_todos):
+        for k in ["user_id", "icon", "title", "contents", "color", "done"]:
+            assert getattr(val, k) == getattr(exp, k), k

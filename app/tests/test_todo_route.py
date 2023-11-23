@@ -1,36 +1,25 @@
-from .. import crud, schemas
-
-email = "test_3@example.com"
-
-
 def test_get_todos_success(authorized_client, test_todos):
-    breakpoint()
     date_time = test_todos[0].date
     date = date_time.date()
 
     response = authorized_client.get(
         "/todos/",
-        params={"date": date, "skip": 0, "limit": 100},
+        params={"date": date, "skip": 2, "limit": 4},
     )
 
     assert response.status_code == 200, response.text
+    data = response.json()
+
+    assert len(data) == 2
 
 
-def test_create_user_fail():
-    crud.create_user(
-        db,
-        schemas.UserCreate(
-            email=email + "a",
-            password="test_password",
-        ),
+def test_get_todos_fail(client, test_todos):
+    date_time = test_todos[0].date
+    date = date_time.date()
+
+    response = client.get(
+        "/todos/",
+        params={"date": date, "skip": 0, "limit": 100},
     )
 
-    response = client.post(
-        "/users/",
-        json={
-            "email": email + "a",
-            "password": "test_password",
-        },
-    )
-
-    assert response.status_code == 400, response.text
+    assert response.status_code == 401, response.text
