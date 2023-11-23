@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
 
 from ..database import Base
 
@@ -13,3 +14,9 @@ class Todo(Base):
     contents = Column(String)
     color = Column(String)
     done = Column(Boolean)
+
+    user_id = Column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
+
+    user = relationship("User")

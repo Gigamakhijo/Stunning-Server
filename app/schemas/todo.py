@@ -1,10 +1,10 @@
-from typing import List
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel
 
 
-class Todo(BaseModel):
+class TodoBase(BaseModel):
     date: datetime
     icon: str
     title: str
@@ -13,9 +13,13 @@ class Todo(BaseModel):
     done: bool
 
 
+class TodoCreate(TodoBase):
+    user_id: int
+
+
 class TodoListGet(BaseModel):
     date: str
 
 
 class TodoList(TodoListGet):
-    todolist: List[Todo]
+    todolist: List[TodoBase]

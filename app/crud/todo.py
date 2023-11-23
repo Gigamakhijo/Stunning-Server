@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 
 
-def add_todo(db: Session, todo: schemas.Todo):
+def add_todo(db: Session, todo: schemas.TodoCreate):
     db_todo = models.Todo(
         date=todo.date,
         icon=todo.icon,
@@ -20,7 +20,5 @@ def add_todo(db: Session, todo: schemas.Todo):
     return db_todo
 
 
-def get_todolist(db: Session, date: schemas.TodoListGet):
-    limit = db.query(models.Todo).filter(models.Todo.date == date).count()
+def get_todos(db: Session, date: schemas.TodoListGet, skip: int = 0, limit: int = 100):
     return db.query(models.Todo).filter(models.Todo.date == date).limit(limit).all()
-    ...
