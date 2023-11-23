@@ -25,7 +25,7 @@ def test_create_todo(session):
         db,
         schemas.TodoCreate(
             user_id=1,
-            date= datetime.datetime(2023,11,24,1,1,45),
+            date= datetime.datetime(2023,11,24,1,45),
             icon="iconname",
             title="title_",
             contents="content_",
