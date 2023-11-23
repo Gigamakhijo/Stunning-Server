@@ -4,7 +4,7 @@ from sqlalchemy.pool import StaticPool
 
 from .. import crud, schemas
 from ..database import Base
-from . import conftest
+import datetime
 
 SQLALCHEMY_DATABASE_URL = "sqlite://"
 
@@ -18,23 +18,14 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 Base.metadata.create_all(bind=engine)
 
-
-def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
-
-
-def test_create_todo():
-    db = next(override_get_db())
+def test_create_todo(session):
+    db = session
 
     response = crud.create_todo(
         db,
         schemas.TodoCreate(
             user_id=1,
-            date="1",
+            date= datetime.datetime(2023,11,24,1,1,45),
             icon="iconname",
             title="title_",
             contents="content_",
@@ -53,7 +44,7 @@ def test_get_todolist(session):
         db,
         schemas.TodoCreate(
             user_id=1,
-            date="1",
+            date= datetime.datetime(2023,11,24,1,45),
             icon="iconname",
             title="title_",
             contents="content_",
@@ -66,7 +57,7 @@ def test_get_todolist(session):
         db,
         schemas.TodoCreate(
             user_id=1,
-            date="86401",
+            date=datetime.datetime(2023,11,25,1,45),
             icon="iconname",
             title="title",
             contents="content",
