@@ -110,6 +110,24 @@ def test_todos(test_user, session):
 
 
 @pytest.fixture
+def test_todo(test_user, session):
+    t = 1
+    todo = crud.create_todo(
+        session,
+        schemas.TodoCreate(
+            date=datetime.datetime(2023, 11, 23, t, 24, 10),
+            icon="iconname",
+            title=f"title_{t}",
+            contents=f"content_{t}",
+            color="#FFFFFF",
+            done=False,
+            user_id=test_user["id"],
+        ),
+    )
+    
+    return todo
+
+@pytest.fixture
 def token(test_user):
     return oauth2.create_access_token({"sub": test_user["email"]})
 
