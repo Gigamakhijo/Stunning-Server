@@ -1,47 +1,12 @@
-from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
-from .. import crud, oauth2, schemas
-from ..database import Base, get_db
-from ..main import app
-
-SQLALCHEMY_DATABASE_URL = "sqlite://"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+from .. import crud, oauth2
 
 
-Base.metadata.create_all(bind=engine)
+def test_create_user_success(client, session, email, password):
+    body = {"email": email, "password": password}
 
-
-def override_get_db():
-    try:
-        db = TestingSessionLocal()
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-client = TestClient(app)
-
-email = "test_2@example.com"
-
-
-def test_create_user_success():
     response = client.post(
         "/users/",
-        json={
-            "email": email,
-            "password": "test_password",
-        },
+        json=body,
     )
 
     assert response.status_code == 201, response.text
@@ -49,27 +14,16 @@ def test_create_user_success():
     data = response.json()
     assert data["email"] == email
 
-    db = next(override_get_db())
-    user = crud.get_user_by_email(db, email)
-    assert oauth2.verify_password("test_password", user.hashed_password)
+    user = crud.get_user_by_email(session, email)
+    assert oauth2.verify_password(password, user.hashed_password)
 
 
-def test_create_user_fail():
-    db = next(override_get_db())
-
-    crud.create_user(
-        db,
-        schemas.UserCreate(
-            email=email + "a",
-            password="test_password",
-        ),
-    )
-
+def test_create_user_fail(client, test_user):
     response = client.post(
         "/users/",
         json={
-            "email": email + "a",
-            "password": "test_password",
+            "email": test_user["email"],
+            "password": "asdf",
         },
     )
 
