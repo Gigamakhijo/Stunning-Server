@@ -124,8 +124,9 @@ def test_todo(test_user, session):
             user_id=test_user["id"],
         ),
     )
-    
+
     return todo
+
 
 @pytest.fixture
 def token(test_user):

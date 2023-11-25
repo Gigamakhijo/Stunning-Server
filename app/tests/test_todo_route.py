@@ -1,5 +1,6 @@
 from .. import schemas
 
+
 def test_get_todos_success(authorized_client, test_todos):
     date_time = test_todos[0].date
     date = date_time.date()
@@ -27,13 +28,13 @@ def test_get_todos_fail(client, test_todos):
     assert response.status_code == 401, response.text
 
 
-def test_add_todo_success(authorized_client,test_todo: schemas.TodoCreate):
+def test_add_todo_success(authorized_client, test_todo: schemas.TodoCreate):
     date_time = test_todo.date
     date = str(date_time)
 
     response = authorized_client.post(
-        "/todos/add",
-        json = {
+        "/todos/",
+        json={
             "date": date,
             "icon": test_todo.icon,
             "title": test_todo.title,
@@ -41,19 +42,19 @@ def test_add_todo_success(authorized_client,test_todo: schemas.TodoCreate):
             "color": test_todo.color,
             "done": test_todo.done,
             "user_id": test_todo.user_id,
-        }
+        },
     )
 
     assert response.status_code == 200, response.text
 
 
-def test_add_todo_failed(client,test_todo: schemas.TodoCreate):
+def test_add_todo_failed(client, test_todo: schemas.TodoCreate):
     date_time = test_todo.date
     date = str(date_time)
 
     response = client.post(
-        "/todos/add",
-        json = {
+        "/todos/",
+        json={
             "date": date,
             "icon": test_todo.icon,
             "title": test_todo.title,
@@ -61,9 +62,7 @@ def test_add_todo_failed(client,test_todo: schemas.TodoCreate):
             "color": test_todo.color,
             "done": test_todo.done,
             "user_id": test_todo.user_id,
-        }
+        },
     )
 
     assert response.status_code == 401, response.text
-
-    ...
