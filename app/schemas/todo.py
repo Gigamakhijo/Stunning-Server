@@ -9,6 +9,7 @@ class TodoBase(BaseModel):
 
 
 class TodoGet(TodoBase):
+    id: int
     icon: str
     title: str
     contents: str
