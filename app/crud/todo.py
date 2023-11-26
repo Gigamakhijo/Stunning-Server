@@ -25,15 +25,14 @@ def create_todo(db: Session, todo: schemas.TodoCreate):
 
 
 def get_todos_by_date(
-    db: Session, date: datetime.date, skip: int = 0, limit: int = 100
+    db: Session, user_id: int, date: datetime.date, skip: int = 0, limit: int = 100
 ):
     return (
         db.query(models.Todo)
-        .where(
-            and_(
-                models.Todo.date >= date,
-                models.Todo.date < date + datetime.timedelta(days=1),
-            )
+        .filter(
+            models.Todo.user_id == user_id,
+            models.Todo.date >= date,
+            models.Todo.date < date + datetime.timedelta(days=1),
         )
         .slice(skip, limit)
         .all()
