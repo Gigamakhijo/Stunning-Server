@@ -10,6 +10,7 @@ class TodoBase(BaseModel):
     user_id: int
 
 class TodoGet(TodoBase):
+    id: int
     icon: str
     title: str
     contents: str

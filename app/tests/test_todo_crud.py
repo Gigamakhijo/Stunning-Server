@@ -23,7 +23,9 @@ def test_create_todo(session):
 def test_get_todolist(session, test_todos):
     date = test_todos[0].date
 
-    response = crud.get_todos_by_date(session,user_id=1, date=date, skip=0, limit=2)
+    response = crud.get_todos_by_date(
+        session, user_id=test_todos[0].user_id, date=date, skip=0, limit=2
+    )
 
     for val, exp in zip(response, test_todos):
         for k in ["user_id", "icon", "title", "contents", "color", "done"]:

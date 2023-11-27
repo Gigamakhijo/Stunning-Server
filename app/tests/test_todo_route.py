@@ -14,6 +14,7 @@ def test_get_todos_success(authorized_client, test_todos):
     data = response.json()
 
     assert len(data) == 2
+    print(data)
 
 
 def test_get_todos_fail(client, test_todos):
