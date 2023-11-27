@@ -37,17 +37,18 @@ def get_todos_by_date(
         .all()
     )
 
-def modify_todo(db:Session, todo_id: schemas.TodoIdGet, todo: schemas.TodoCreate):
+
+def modify_todo(db: Session, todo_id: schemas.TodoIdGet, todo: schemas.TodoCreate):
     db.query(models.Todo).filter(models.Todo.id == todo_id).update(todo.dict())
 
     db.commit()
 
 
-def delete_todo(db:Session, todo_id: schemas.TodoIdGet):
+def delete_todo(db: Session, todo_id: schemas.TodoIdGet):
     db_todo = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
     db.delete(db_todo)
     db.commit()
-    
 
-def get_todo_by_todo_id(db: Session, todo_id:schemas.TodoIdGet):
+
+def get_todo_by_todo_id(db: Session, todo_id: schemas.TodoIdGet):
     return db.query(models.Todo).filter(models.Todo.id == todo_id).first()
