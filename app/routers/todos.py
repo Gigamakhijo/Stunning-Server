@@ -19,6 +19,8 @@ def create_todo(
     if current_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
+    current_user.id
+
     return crud.create_todo(db, todo)
 
 
@@ -33,30 +35,5 @@ def get_todos(
     if current_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    todos = crud.get_todos_by_date(db, current_user.id, date, skip=skip, limit=limit)
+    todos = crud.get_todos_by_date(db, date, skip=skip, limit=limit)
     return todos
-
-@router.put("/",response_model= schemas.TodoCreate)
-def modify_todo(
-    current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
-    todo_id: schemas.TodoIdGet,
-    todo: schemas.TodoCreate,
-    db: Session = Depends(get_db),
-):
-    if current_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return crud.modify_todo(db,todo_id,todo)
-    
-
-@router.delete("/",status_code=status.HTTP_204_NO_CONTENT)
-def delete_todo(
-    current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
-    todo_id: int,
-    db: Session = Depends(get_db),
-):
-    if current_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    return crud.delete_todo(db,todo_id)
-    

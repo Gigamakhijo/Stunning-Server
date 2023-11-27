@@ -7,7 +7,7 @@ from ..database import Base
 
 
 class Todo(Base):
-    __tablename__ = "todos"
+    __tablename__ = "todo"
 
     id = Column(Integer, primary_key=True, nullable=False, index=True)
     date = Column(DateTime, default=datetime.datetime.utcnow)
