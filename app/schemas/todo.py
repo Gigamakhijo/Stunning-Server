@@ -3,11 +3,14 @@ from typing import List
 
 from pydantic import BaseModel
 
+
 class TodoIdGet(BaseModel):
     todo_id: int
 
+
 class TodoBase(BaseModel):
     user_id: int
+
 
 class TodoGet(TodoBase):
     id: int

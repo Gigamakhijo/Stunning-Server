@@ -17,8 +17,4 @@ class Todo(Base):
     color = Column(String)
     done = Column(Boolean)
 
-    user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
-    )
-
-    user = relationship("User")
+    user_id = Column(Integer)
