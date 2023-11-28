@@ -100,8 +100,8 @@ def test_todos(test_user, session):
                 contents=f"content_{t}",
                 color="#FFFFFF",
                 done=False,
-                user_id=test_user["id"],
             ),
+            user_id=test_user["id"],
         )
 
         todos.append(todo)
@@ -111,18 +111,17 @@ def test_todos(test_user, session):
 
 @pytest.fixture
 def test_todo(test_user, session):
-    t = 1
     todo = crud.create_todo(
         session,
         schemas.TodoCreate(
-            date=datetime.datetime(2023, 11, 23, t, 24, 10),
+            date=datetime.datetime(2023, 11, 23, 1, 24, 10),
             icon="iconname",
-            title=f"title_{t}",
-            contents=f"content_{t}",
+            title="title",
+            contents="content",
             color="#FFFFFF",
             done=False,
-            user_id=test_user["id"],
         ),
+        user_id=test_user["id"],
     )
 
     return todo

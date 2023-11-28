@@ -1,11 +1,12 @@
 import datetime
 
+from sqlalchemy import delete, update
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
 
 
-def create_todo(db: Session, todo: schemas.TodoCreate):
+def create_todo(db: Session, todo: schemas.TodoCreate, user_id: int):
     db_todo = models.Todo(
         date=todo.date,
         icon=todo.icon,
@@ -13,7 +14,7 @@ def create_todo(db: Session, todo: schemas.TodoCreate):
         contents=todo.contents,
         color=todo.color,
         done=todo.done,
-        user_id=todo.user_id,
+        user_id=user_id,
     )
 
     db.add(db_todo)
@@ -24,7 +25,7 @@ def create_todo(db: Session, todo: schemas.TodoCreate):
 
 
 def get_todos_by_date(
-    db: Session, user_id: int, date: datetime.date, skip: int = 0, limit: int = 100
+    db: Session, date: datetime.date, user_id: int, skip: int = 0, limit: int = 100
 ):
     return (
         db.query(models.Todo)
@@ -38,17 +39,15 @@ def get_todos_by_date(
     )
 
 
-def modify_todo(db: Session, todo_id: schemas.TodoIdGet, todo: schemas.TodoCreate):
+def update_todo(db: Session, todo: schemas.TodoEdit, todo_id: int):
     db.query(models.Todo).filter(models.Todo.id == todo_id).update(todo.dict())
-
     db.commit()
 
 
-def delete_todo(db: Session, todo_id: schemas.TodoIdGet):
-    db_todo = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
-    db.delete(db_todo)
-    db.commit()
+def delete_todo(db: Session, todo_id: int):
+    row = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+    db.delete(row)
 
 
-def get_todo_by_todo_id(db: Session, todo_id: schemas.TodoIdGet):
+def get_todo(db: Session, todo_id: int):
     return db.query(models.Todo).filter(models.Todo.id == todo_id).first()

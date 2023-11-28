@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship
 
 from ..database import Base
 
@@ -14,3 +15,5 @@ class User(Base):
     phone_number = Column(String)
     status_message = Column(String)
     hashed_password = Column(String, nullable=False)
+
+    todos = relationship("Todo", backref="user")

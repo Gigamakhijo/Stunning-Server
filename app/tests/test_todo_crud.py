@@ -33,9 +33,7 @@ def test_get_todolist(session, test_todos):
 
 
 def test_modify_todo(session, test_todo):
-    todo = test_todo
-
-    todo_create = schemas.TodoCreate(
+    todo = schemas.TodoCreate(
         user_id=1,
         date=datetime.datetime(2023, 11, 24, 1, 45),
         icon="iconname",
@@ -45,10 +43,12 @@ def test_modify_todo(session, test_todo):
         done=False,
     )
 
-    crud.modify_todo(session, todo_id=todo.id, todo=todo_create)
+    crud.modify_todo(session, todo=test_todo)
+
+    new_todo = crud.get_todo(session, test_todo.id)
 
     for k in ["user_id", "icon", "title", "contents", "color", "done"]:
-        assert getattr(todo, k) == getattr(todo_create, k)
+        assert getattr(new_todo, k) == getattr(todo, k)
 
 
 def test_delete_todo(session, test_todo):
@@ -57,8 +57,8 @@ def test_delete_todo(session, test_todo):
     for k in ["user_id", "icon", "title", "contents", "color", "done"]:
         assert getattr(todo, k) == getattr(test_todo, k)
 
-    crud.delete_todo(session, todo_id=todo.id)
+    crud.delete_todo(session, todo)
 
-    response = crud.get_todo_by_todo_id(session, todo_id=todo.id)
+    response = crud.get_todo_by_todo_id(session, todo)
 
     assert response is None

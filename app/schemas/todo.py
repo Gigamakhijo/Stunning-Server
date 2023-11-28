@@ -4,30 +4,26 @@ from typing import List
 from pydantic import BaseModel
 
 
-class TodoIdGet(BaseModel):
-    todo_id: int
-
-
 class TodoBase(BaseModel):
-    user_id: int
+    date: datetime
+    icon: str
+    title: str
+    contents: str
+    color: str
+    done: bool
 
 
 class TodoGet(TodoBase):
     id: int
-    icon: str
-    title: str
-    contents: str
-    color: str
-    done: bool
+    user_id: int
 
 
 class TodoCreate(TodoBase):
-    date: datetime | None = None
-    icon: str
-    title: str
-    contents: str
-    color: str
-    done: bool
+    ...
+
+
+class TodoEdit(TodoCreate):
+    ...
 
 
 class TodoListGet(BaseModel):
