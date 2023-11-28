@@ -127,36 +127,16 @@ def test_todo(test_user, session):
 
     return todo
 
-
-@pytest.fixture
-def test_feeds(test_user, session):
-    feeds = []
-    for i in range(10):
-        feed = crud.create_feed(
-            session,
-            schemas.FeedCreate(
-                user_id=test_user["id"],
-                video="video_",
-                concentration=88,
-                thumnail="thumnail_",
-            ),
-        )
-
-        feeds.append(feed)
-
-    return feeds
-
-
 @pytest.fixture
 def test_feed(test_user, session):
     feed = crud.create_feed(
         session,
         schemas.FeedCreate(
-            user_id=test_user["id"],
             video="video_",
             concentration=88,
             thumnail="thumnail_",
         ),
+        user_id=test_user["id"],
     )
     return feed
 
