@@ -10,7 +10,7 @@ from ..database import get_db
 router = APIRouter(prefix="/todos", tags=["todos"])
 
 
-@router.post("/", response_model=schemas.TodoCreate, status_code=status.HTTP_200_OK)
+@router.post("/", response_model=schemas.TodoGet, status_code=status.HTTP_200_OK)
 def create_todo(
     current_user: Annotated[schemas.UserAuth, Depends(oauth2.get_authenticated_user)],
     todo: schemas.TodoCreate,

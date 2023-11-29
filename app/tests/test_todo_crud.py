@@ -32,7 +32,7 @@ def test_get_todolist(session, test_todos):
             assert getattr(val, k) == getattr(exp, k), k
 
 
-def test_modify_todo(session, test_todo):
+def test_update_todo(session, test_todo):
     todo = schemas.TodoCreate(
         user_id=1,
         date=datetime.datetime(2023, 11, 24, 1, 45),
@@ -43,7 +43,7 @@ def test_modify_todo(session, test_todo):
         done=False,
     )
 
-    crud.modify_todo(session, todo=test_todo)
+    crud.update_todo(session, todo=schemas.TodoEdit(**test_todo))
 
     new_todo = crud.get_todo(session, test_todo.id)
 

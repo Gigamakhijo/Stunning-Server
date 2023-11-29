@@ -1,3 +1,4 @@
+import copy
 import datetime
 
 import pytest
@@ -115,10 +116,19 @@ def token(test_user):
 
 
 @pytest.fixture
-def authorized_client(client, token):
+def authorized_client(session, token):
+    def override_get_db():
+        try:
+            yield session
+        finally:
+            session.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    client = TestClient(app)
+
     client.headers = {**client.headers, "Authorization": f"Bearer {token}"}
 
-    return client
+    yield client
 
 
 @pytest.fixture
@@ -136,5 +146,7 @@ def test_todo(authorized_client):
     )
 
     assert response.status_code == 200, response.text
+
     data = response.json()
+
     return data

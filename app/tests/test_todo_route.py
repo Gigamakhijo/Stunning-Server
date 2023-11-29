@@ -45,7 +45,7 @@ def test_add_todo_failed(client, test_todo: schemas.TodoCreate):
     assert response.status_code == 401, response.text
 
 
-def test_modify_todo_success(authorized_client, test_todo):
+def test_update_todo_success(authorized_client, test_todo):
     todo_id = 1
     date_time = test_todo["date"]
     date = str(date_time)
@@ -63,12 +63,12 @@ def test_modify_todo_success(authorized_client, test_todo):
     assert response.status_code == 200, response.text
 
 
-def test_modify_todo_failed(client, test_todo):
+def test_update_todo_failed(client, test_todo):
     date_time = test_todo["date"]
     date = str(date_time)
 
     response = client.put(
-        f"/todos/{test_todo.id}",
+        f"/todos/{test_todo['id']}",
         json={"date": date, **test_todo},
     )
 
