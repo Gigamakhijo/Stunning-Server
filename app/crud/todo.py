@@ -39,8 +39,10 @@ def get_todos_by_date(
 
 
 def update_todo(db: Session, todo: schemas.TodoEdit, todo_id: int):
-    db.query(models.Todo).filter(models.Todo.id == todo_id).update(**todo.dict())
+    db.query(models.Todo).filter(models.Todo.id == todo_id).update(todo.dict())
     db.commit()
+
+    return get_todo(db, todo_id)
 
 
 def delete_todo(db: Session, todo_id: int):

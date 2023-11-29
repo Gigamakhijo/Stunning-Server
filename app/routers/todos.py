@@ -38,7 +38,7 @@ def get_todos(
     )
 
 
-@router.put("/{id}", response_model=schemas.TodoEdit)
+@router.put("/{id}", response_model=schemas.TodoGet)
 def update_todo(
     id: int,
     current_user: Annotated[schemas.UserAuth, Depends(oauth2.get_authenticated_user)],
@@ -56,7 +56,7 @@ def update_todo(
             detail=f"todo with id: {id} does not exist",
         )
 
-    return crud.update_todo(db, todo, todo_id=todo.id)
+    return crud.update_todo(db, new_todo, todo_id=todo.id)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -75,5 +75,3 @@ def delete_todo(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"todo with id: {id} does not exist",
         )
-
-    return crud.delete_todo(db, id)

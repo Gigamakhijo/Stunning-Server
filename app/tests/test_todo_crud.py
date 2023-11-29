@@ -5,7 +5,6 @@ from .. import crud, schemas
 
 def test_create_todo(session):
     todo_create = schemas.TodoCreate(
-        user_id=1,
         date=datetime.datetime(2023, 11, 24, 1, 45),
         icon="iconname",
         title="title_",
@@ -14,9 +13,9 @@ def test_create_todo(session):
         done=False,
     )
 
-    todo = crud.create_todo(session, todo_create)
+    todo = crud.create_todo(session, todo_create, user_id=1)
 
-    for k in ["user_id", "icon", "title", "contents", "color", "done"]:
+    for k in ["icon", "title", "contents", "color", "done"]:
         assert getattr(todo, k) == getattr(todo_create, k)
 
 
@@ -33,32 +32,19 @@ def test_get_todolist(session, test_todos):
 
 
 def test_update_todo(session, test_todo):
-    todo = schemas.TodoCreate(
-        user_id=1,
-        date=datetime.datetime(2023, 11, 24, 1, 45),
-        icon="iconname",
-        title="title_",
-        contents="content_",
-        color="#FFFFFF",
-        done=False,
+    crud.update_todo(
+        session, todo=schemas.TodoEdit(**test_todo), todo_id=test_todo["id"]
     )
 
-    crud.update_todo(session, todo=schemas.TodoEdit(**test_todo))
-
-    new_todo = crud.get_todo(session, test_todo.id)
+    new_todo = crud.get_todo(session, test_todo["id"])
 
     for k in ["user_id", "icon", "title", "contents", "color", "done"]:
-        assert getattr(new_todo, k) == getattr(todo, k)
+        assert getattr(new_todo, k) == test_todo[k]
 
 
 def test_delete_todo(session, test_todo):
-    todo = test_todo
+    crud.delete_todo(session, test_todo["id"])
 
-    for k in ["user_id", "icon", "title", "contents", "color", "done"]:
-        assert getattr(todo, k) == getattr(test_todo, k)
-
-    crud.delete_todo(session, todo)
-
-    response = crud.get_todo_by_todo_id(session, todo)
+    response = crud.get_todo(session, test_todo["id"])
 
     assert response is None

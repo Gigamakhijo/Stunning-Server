@@ -23,7 +23,9 @@ class TodoCreate(TodoBase):
 
 
 class TodoEdit(TodoCreate):
-    ...
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 
 class TodoListGet(BaseModel):

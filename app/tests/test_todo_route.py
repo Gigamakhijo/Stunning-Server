@@ -50,6 +50,8 @@ def test_update_todo_success(authorized_client, test_todo):
     date_time = test_todo["date"]
     date = str(date_time)
 
+    print(test_todo)
+
     authorized_client.post(
         f"/todos/{todo_id}",
         json={"date": date, **test_todo},
@@ -57,7 +59,14 @@ def test_update_todo_success(authorized_client, test_todo):
 
     response = authorized_client.put(
         f"/todos/{todo_id}",
-        json={"todo_id": todo_id, "date": date, **test_todo},
+        json={
+            "date": date,
+            "icon": "string",
+            "title": "string",
+            "contents": "string",
+            "color": "string",
+            "done": True,
+        },
     )
 
     assert response.status_code == 200, response.text
