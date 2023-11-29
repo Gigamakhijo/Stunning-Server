@@ -75,3 +75,5 @@ def delete_todo(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"todo with id: {id} does not exist",
         )
+
+    crud.delete_todo(db, todo.id)

@@ -45,6 +45,6 @@ def test_update_todo(session, test_todo):
 def test_delete_todo(session, test_todo):
     crud.delete_todo(session, test_todo["id"])
 
-    response = crud.get_todo(session, test_todo["id"])
+    todo = crud.get_todo(session, test_todo["id"])
 
-    assert response is None
+    assert todo is None

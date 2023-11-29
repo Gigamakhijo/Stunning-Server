@@ -85,16 +85,22 @@ def test_update_todo_failed(client, test_todo):
 
 
 def test_delete_todo_success(authorized_client, test_todo):
-    todo_id = 1
-    authorized_client.delete(f"/todos/{todo_id}")
-
-    response = authorized_client.delete(f"/todos/{todo_id}")
+    response = authorized_client.delete(f"/todos/{test_todo['id']}")
 
     assert response.status_code == 204
 
 
-def test_delete_todo_failed(client):
-    todo_id = 1
-    response = client.delete(f"/todos/{todo_id}")
+def test_delete_todo_failed(authorized_client, test_todo):
+    response = authorized_client.delete(f"/todos/{test_todo['id']}")
+
+    assert response.status_code == 204
+
+    response = authorized_client.delete(f"/todos/{test_todo['id']}")
+
+    assert response.status_code == 404
+
+
+def test_delete_todo_auth_failed(client, test_todo):
+    response = client.delete(f"/todos/{test_todo['id']}")
 
     assert response.status_code == 401
