@@ -63,7 +63,6 @@ def update_todo(
 def delete_todo(
     id: int,
     current_user: Annotated[schemas.UserAuth, Depends(oauth2.get_authenticated_user)],
-    todo_id: int,
     db: Session = Depends(get_db),
 ):
     if current_user is None:
