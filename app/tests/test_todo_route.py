@@ -21,104 +21,64 @@ def test_get_todos_fail(client, test_todos):
     date_time = test_todos[0].date
     date = date_time.date()
 
-    response = client.get(
-        "/todos/",
-        params={"date": date, "skip": 0, "limit": 100},
-    )
+    response = client.get("/todos/", params={"date": date, "skip": 0, "limit": 100})
 
     assert response.status_code == 401, response.text
 
 
-def test_add_todo_success(authorized_client, test_todo: schemas.TodoCreate):
-    date_time = test_todo.date
+def test_add_todo_success(authorized_client, test_todo: schemas.TodoCreate, test_user):
+    date_time = test_todo["date"]
     date = str(date_time)
 
-    response = authorized_client.post(
-        "/todos/",
-        json={
-            "date": date,
-            "icon": test_todo.icon,
-            "title": test_todo.title,
-            "contents": test_todo.contents,
-            "color": test_todo.color,
-            "done": test_todo.done,
-            "user_id": test_todo.user_id,
-        },
-    )
+    response = authorized_client.post("/todos/", json={"date": date, **test_todo})
 
     assert response.status_code == 200, response.text
+    data = response.json()
 
 
 def test_add_todo_failed(client, test_todo: schemas.TodoCreate):
-    date_time = test_todo.date
+    date_time = test_todo["date"]
     date = str(date_time)
 
-    response = client.post(
-        "/todos/",
-        json={
-            "date": date,
-            "icon": test_todo.icon,
-            "title": test_todo.title,
-            "contents": test_todo.contents,
-            "color": test_todo.color,
-            "done": test_todo.done,
-            "user_id": test_todo.user_id,
-        },
-    )
+    response = client.post("/todos/", json={"date": date, **test_todo})
 
     assert response.status_code == 401, response.text
 
 
-def test_modify_todo_success(authorized_client, test_todo):
+def test_update_todo_success(authorized_client, test_todo):
     todo_id = 1
-    date_time = test_todo.date
+    date_time = test_todo["date"]
     date = str(date_time)
 
+    print(test_todo)
+
     authorized_client.post(
-        "/todos/",
-        json={
-            "date": date,
-            "icon": test_todo.icon,
-            "title": test_todo.title,
-            "contents": test_todo.contents,
-            "color": test_todo.color,
-            "done": test_todo.done,
-            "user_id": test_todo.user_id,
-        },
+        f"/todos/{todo_id}",
+        json={"date": date, **test_todo},
     )
 
     response = authorized_client.put(
-        "/todos/",
+        f"/todos/{todo_id}",
         json={
-            "todo_id": todo_id,
             "date": date,
-            "icon": test_todo.icon,
-            "title": test_todo.title,
-            "contents": test_todo.contents,
-            "color": test_todo.color,
-            "done": test_todo.done,
-            "user_id": test_todo.user_id,
+            "icon": "string",
+            "title": "string",
+            "contents": "string",
+            "color": "string",
+            "done": True,
         },
     )
 
     assert response.status_code == 200, response.text
 
 
-def test_modify_todo_failed(client, test_todo):
-    date_time = test_todo.date
+def test_update_todo_failed(client, test_todo):
+    date_time = test_todo["date"]
     date = str(date_time)
 
     response = client.put(
-        "/todos/",
-        json={
-            "date": date,
-            "icon": test_todo.icon,
-            "title": test_todo.title,
-            "contents": test_todo.contents,
-            "color": test_todo.color,
-            "done": test_todo.done,
-            "user_id": test_todo.user_id,
-        },
+        f"/todos/{test_todo['id']}",
+        json={"date": date, **test_todo},
     )
 
     assert response.status_code == 401, response.text
@@ -126,36 +86,15 @@ def test_modify_todo_failed(client, test_todo):
 
 def test_delete_todo_success(authorized_client, test_todo):
     todo_id = 1
-    date_time = test_todo.date
-    date = str(date_time)
+    authorized_client.delete(f"/todos/{todo_id}")
 
-    authorized_client.post(
-        "/todos/",
-        json={
-            "date": date,
-            "icon": test_todo.icon,
-            "title": test_todo.title,
-            "contents": test_todo.contents,
-            "color": test_todo.color,
-            "done": test_todo.done,
-            "user_id": test_todo.user_id,
-        },
-    )
-
-    response = authorized_client.request(
-        "DELETE",
-        "/todos/",
-        params={"todo_id": todo_id},
-    )
+    response = authorized_client.delete(f"/todos/{todo_id}")
 
     assert response.status_code == 204
 
 
 def test_delete_todo_failed(client):
     todo_id = 1
-    response = client.delete(
-        "/todos/",
-        params={"todo_id": todo_id},
-    )
+    response = client.delete(f"/todos/{todo_id}")
 
     assert response.status_code == 401

@@ -1,3 +1,4 @@
+import copy
 import datetime
 
 import pytest
@@ -100,8 +101,8 @@ def test_todos(test_user, session):
                 contents=f"content_{t}",
                 color="#FFFFFF",
                 done=False,
-                user_id=test_user["id"],
             ),
+            user_id=test_user["id"],
         )
 
         todos.append(todo)
@@ -110,31 +111,42 @@ def test_todos(test_user, session):
 
 
 @pytest.fixture
-def test_todo(test_user, session):
-    t = 1
-    todo = crud.create_todo(
-        session,
-        schemas.TodoCreate(
-            date=datetime.datetime(2023, 11, 23, t, 24, 10),
-            icon="iconname",
-            title=f"title_{t}",
-            contents=f"content_{t}",
-            color="#FFFFFF",
-            done=False,
-            user_id=test_user["id"],
-        ),
-    )
-
-    return todo
-
-
-@pytest.fixture
 def token(test_user):
     return oauth2.create_access_token({"sub": test_user["email"]})
 
 
 @pytest.fixture
-def authorized_client(client, token):
+def authorized_client(session, token):
+    def override_get_db():
+        try:
+            yield session
+        finally:
+            session.close()
+
+    app.dependency_overrides[get_db] = override_get_db
+    client = TestClient(app)
+
     client.headers = {**client.headers, "Authorization": f"Bearer {token}"}
 
-    return client
+    yield client
+
+
+@pytest.fixture
+def test_todo(authorized_client):
+    response = authorized_client.post(
+        "/todos/",
+        json={
+            "date": str(datetime.datetime(2023, 11, 23, 1, 24, 10)),
+            "icon": "iconname",
+            "title": "title",
+            "contents": "content",
+            "color": "#FFFFFF",
+            "done": False,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+
+    data = response.json()
+
+    return data

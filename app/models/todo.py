@@ -1,7 +1,6 @@
 import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
 
 from ..database import Base
 
@@ -17,4 +16,4 @@ class Todo(Base):
     color = Column(String)
     done = Column(Boolean)
 
-    user_id = Column(Integer)
+    user_id = Column(Integer, ForeignKey("users.id"))

@@ -30,7 +30,7 @@ def create_user(
 
 @router.get("/me", response_model=schemas.UserGet)
 def get_user(
-    current_user: Annotated[schemas.UserAuth, Depends(oauth2.get_authenticated_user)],
+    current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
 ):
     if current_user is None:
         raise HTTPException(status_code=404, detail="User not found")

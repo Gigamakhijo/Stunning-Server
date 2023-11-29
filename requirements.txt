@@ -4,8 +4,10 @@ gunicorn
 python-multipart
 python-jose
 passlib[bcrypt]
-sqlalchemy
+sqlalchemy==1.4.*
 
 pytest
+pytest-xdist
+pytest-cov
 httpx
 ruff
