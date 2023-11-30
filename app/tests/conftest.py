@@ -1,4 +1,3 @@
-import copy
 import datetime
 
 import pytest
@@ -109,6 +108,24 @@ def test_todos(test_user, session):
 
     return todos
 
+@pytest.fixture
+def test_feeds(test_user,session):
+    feeds = []
+    for t in range(10):
+        feed = crud.create_feed(
+            session,
+            schemas.FeedCreate(
+                date =str(datetime.datetime(2023, 11, 23, t, 24, 10)),
+                video = f"/video_{t}/",
+                thumnail = f"thumnail_{t}",
+                concentration = t,
+            ),
+            user_id=test_user["id"],
+        )
+
+        feeds.append(feed)
+
+    return feeds
 
 @pytest.fixture
 def token(test_user):
@@ -150,3 +167,22 @@ def test_todo(authorized_client):
     data = response.json()
 
     return data
+
+
+@pytest.fixture
+def test_feed(authorized_client, test_user):
+    response = authorized_client.post(
+        "/feeds/",
+        json={
+            "date": str(datetime.datetime(2023, 11, 23, 1, 24, 10)),
+            "video": "/video/",
+            "thumnail": "thumnail_",
+            "concentration": 80,
+        },
+    )
+    assert response.status_code == 200, response.text
+
+    data = response.json()
+
+    return data
+
