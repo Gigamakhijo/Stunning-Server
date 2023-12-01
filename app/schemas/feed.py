@@ -13,3 +13,6 @@ class FeedBase(BaseModel):
 class FeedCreate(FeedBase):
     ...
 
+
+class FeedGet(FeedBase):
+    id: int
