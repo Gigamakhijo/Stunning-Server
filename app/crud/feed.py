@@ -28,3 +28,14 @@ def get_feeds(db: Session, user_id: int, skip: int = 0, limit: int = 100):
         .slice(skip, limit)
         .all()
     )
+
+def get_feed(db: Session,feed_id: int):
+    return db.query(models.Feed).filter(models.Feed.id == feed_id).first()
+    
+
+def delete_feed(db:Session, feed_id: int):
+    row = db.query(models.Feed).filter(models.Feed.id == feed_id).first()
+    db.delete(row)
+
+    db.commit()
+    

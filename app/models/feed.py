@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, DateTime, String, ForeignKey
+from sqlalchemy.orm import relationship
 
 import datetime
 
@@ -15,3 +16,4 @@ class Feed(Base):
     concentration = Column(Integer)
 
     user_id = Column(Integer, ForeignKey("users.id"))
+    users = relationship("User", back_populates="feeds")
