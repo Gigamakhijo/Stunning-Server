@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from .. import models, schemas, crud
+from .. import models, schemas
 
 
 def create_feed(db: Session, feed: schemas.FeedCreate, user_id: int):
@@ -12,8 +12,6 @@ def create_feed(db: Session, feed: schemas.FeedCreate, user_id: int):
         user_id=user_id,
     )
 
-    crud.upload_file(feed.video)
-
     db.add(db_feed)
     db.commit()
     db.refresh(db_feed)
@@ -22,7 +20,7 @@ def create_feed(db: Session, feed: schemas.FeedCreate, user_id: int):
 
 
 def get_feeds(db: Session, user_id: int, skip: int = 0, limit: int = 100):
-    res = (
+    return (
         db.query(models.Feed)
         .filter(
             models.Feed.user_id == user_id,
@@ -30,13 +28,14 @@ def get_feeds(db: Session, user_id: int, skip: int = 0, limit: int = 100):
         .slice(skip, limit)
         .all()
     )
-    for f in range(len(res)):
-        crud.download_file(res[f].video)
-        crud.download_file(res[f].thumnail)
 
 
 def get_feed(db: Session, feed_id: int):
     return db.query(models.Feed).filter(models.Feed.id == feed_id).first()
+
+
+def get_video(db: Session, feed_id: int):
+    return db.query(models.Feed.video).filter(models.Feed.id == feed_id).fisrt()
 
 
 def delete_feed(db: Session, feed_id: int):
