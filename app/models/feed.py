@@ -12,7 +12,7 @@ class Feed(Base):
     id = Column(Integer, primary_key=True, nullable=False, index=True)
     date = Column(DateTime, default=datetime.datetime.utcnow)
     video = Column(String)
-    thumnail = Column(String)
+    thumbnail = Column(String)
     concentration = Column(Integer)
 
     user_id = Column(Integer, ForeignKey("users.id"))

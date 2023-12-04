@@ -40,7 +40,8 @@ def test_get_feeds_failed(client):
 
     assert response.status_code == 401, response.text
 
-def test_delete_feed_success(authorized_client,test_feed):
+
+def test_delete_feed_success(authorized_client, test_feed):
     response = authorized_client.delete(f"/feeds/{test_feed['id']}")
 
     assert response.status_code == 204

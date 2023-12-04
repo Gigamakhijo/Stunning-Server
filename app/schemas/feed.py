@@ -6,7 +6,7 @@ from pydantic import BaseModel
 class FeedBase(BaseModel):
     date: datetime
     video: str
-    thumnail: str
+    thumbnail: str
     concentration: int
 
 
