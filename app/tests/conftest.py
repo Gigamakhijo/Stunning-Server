@@ -118,7 +118,7 @@ def test_feeds(test_user, session):
             schemas.FeedCreate(
                 date=str(datetime.datetime(2023, 11, 23, t, 24, 10)),
                 video=f"/video_{t}/",
-                thumnail=f"thumnail_{t}",
+                thumbnail=f"thumbnail_{t}",
                 concentration=t,
             ),
             user_id=test_user["id"],
@@ -178,7 +178,7 @@ def test_feed(authorized_client, test_user):
         json={
             "date": str(datetime.datetime(2023, 11, 23, 1, 24, 10)),
             "video": "/video/",
-            "thumnail": "thumnail_",
+            "thumbnail": "thumbnail_",
             "concentration": 80,
         },
     )
