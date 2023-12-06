@@ -7,7 +7,7 @@ def create_feed(db: Session, feed: schemas.FeedCreate, user_id: int):
     db_feed = models.Feed(
         date=feed.date,
         video=feed.video,
-        thumnail=feed.thumnail,
+        thumbnail=feed.thumbnail,
         concentration=feed.concentration,
         user_id=user_id,
     )
@@ -32,6 +32,10 @@ def get_feeds(db: Session, user_id: int, skip: int = 0, limit: int = 100):
 
 def get_feed(db: Session, feed_id: int):
     return db.query(models.Feed).filter(models.Feed.id == feed_id).first()
+
+
+def get_video(db: Session, feed_id: int):
+    return db.query(models.Feed.video).filter(models.Feed.id == feed_id).fisrt()
 
 
 def delete_feed(db: Session, feed_id: int):
