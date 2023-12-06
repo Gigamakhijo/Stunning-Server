@@ -22,6 +22,17 @@ class UserCreate(UserBase):
     password: str
 
 
+class UserEdit(BaseModel):
+    username: str | None = None
+    full_name: str | None = None
+    gender: str | None = None
+    phone_number: str | None = None
+    status_message: str | None = None
+
+    class Config:
+        orm_mode = True
+
+
 class UserGet(UserBase):
     id: int
     username: str | None = None

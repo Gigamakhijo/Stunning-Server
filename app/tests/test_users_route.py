@@ -28,3 +28,14 @@ def test_create_user_fail(client, test_user):
     )
 
     assert response.status_code == 400, response.text
+
+
+def test_update_user_success(authorized_client):
+    response = authorized_client.put(
+        "/users/me", json={"full_name": "1234", "username": "asdf"}
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+
+    assert data["full_name"] == "1234"
+    assert data["username"] == "asdf"

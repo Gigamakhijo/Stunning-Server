@@ -36,3 +36,15 @@ def get_user(
         raise HTTPException(status_code=404, detail="User not found")
 
     return current_user
+
+
+@router.put("/me", response_model=schemas.UserGet)
+def update_user(
+    new_user: schemas.UserEdit,
+    current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
+    db: Session = Depends(get_db),
+):
+    if current_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return crud.update_user(db, current_user, new_user)
