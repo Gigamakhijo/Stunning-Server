@@ -6,6 +6,8 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     access_token_expire_minutes: int = 10000000
+    aws_access_key_id: str
+    aws_secret_access_key: str
 
     model_config = SettingsConfigDict(env_file=".env")
 

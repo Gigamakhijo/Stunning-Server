@@ -1,6 +1,27 @@
-import boto3
 import logging
+
+import boto3
 from botocore.exceptions import ClientError
+
+from .config import settings
+
+
+def get_client():
+    s3_client = boto3.client(
+        "s3",
+        region_name="ap-northeast-2",
+        aws_access_key_id=settings.aws_access_key_id,
+        aws_secret_access_key=settings.aws_secret_access_key,
+    )
+    endpoint_url = s3_client.meta.endpoint_url
+    s3_client = boto3.client(
+        "s3",
+        endpoint_url=endpoint_url,
+        region_name="ap-northeast-2",
+        aws_access_key_id=settings.aws_access_key_id,
+        aws_secret_access_key=settings.aws_secret_access_key,
+    )
+    return s3_client
 
 
 def create_presigned_url(bucket_name, object_name, expiration=3600):
@@ -13,11 +34,15 @@ def create_presigned_url(bucket_name, object_name, expiration=3600):
     """
 
     # Generate a presigned URL for the S3 object
-    s3_client = boto3.client("s3", aws)
+    s3_client = get_client()
+
     try:
         response = s3_client.generate_presigned_url(
             "get_object",
-            Params={"Bucket": bucket_name, "Key": object_name},
+            Params={
+                "Bucket": bucket_name,
+                "Key": object_name,
+            },
             ExpiresIn=expiration,
         )
     except ClientError as e:
@@ -43,7 +68,8 @@ def create_presigned_url_expanded(
     """
 
     # Generate a presigned URL for the S3 client method
-    s3_client = boto3.client("s3")
+    s3_client = get_client()
+
     try:
         response = s3_client.generate_presigned_url(
             ClientMethod=client_method_name,
@@ -56,4 +82,39 @@ def create_presigned_url_expanded(
         return None
 
     # The response contains the presigned URL
+    return response
+
+
+def create_presigned_post(
+    bucket_name, object_name, fields=None, conditions=None, expiration=3600
+):
+    """Generate a presigned URL S3 POST request to upload a file
+
+    :param bucket_name: string
+    :param object_name: string
+    :param fields: Dictionary of prefilled form fields
+    :param conditions: List of conditions to include in the policy
+    :param expiration: Time in seconds for the presigned URL to remain valid
+    :return: Dictionary with the following keys:
+        url: URL to post to
+        fields: Dictionary of form fields and values to submit with the POST
+    :return: None if error.
+    """
+
+    # Generate a presigned S3 POST URL
+    s3_client = get_client()
+
+    try:
+        response = s3_client.generate_presigned_post(
+            bucket_name,
+            object_name,
+            Fields=fields,
+            Conditions=conditions,
+            ExpiresIn=expiration,
+        )
+    except ClientError as e:
+        logging.error(e)
+        return None
+
+    # The response contains the presigned URL and required fields
     return response
