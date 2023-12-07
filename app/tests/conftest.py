@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 import pytest
 from fastapi.testclient import TestClient
@@ -6,7 +7,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from .. import crud, oauth2, schemas
+from .. import crud, oauth2, schemas, utils
 from ..database import Base, get_db
 from ..main import app
 
@@ -110,26 +111,6 @@ def test_todos(test_user, session):
 
 
 @pytest.fixture
-def test_feeds(test_user, session):
-    feeds = []
-    for t in range(10):
-        feed = crud.create_feed(
-            session,
-            schemas.FeedCreate(
-                date=str(datetime.datetime(2023, 11, 23, t, 24, 10)),
-                video=f"/video_{t}/",
-                thumbnail=f"thumbnail_{t}",
-                concentration=t,
-            ),
-            user_id=test_user["id"],
-        )
-
-        feeds.append(feed)
-
-    return feeds
-
-
-@pytest.fixture
 def token(test_user):
     return oauth2.create_access_token({"sub": test_user["email"]})
 
@@ -172,18 +153,53 @@ def test_todo(authorized_client):
 
 
 @pytest.fixture
-def test_feed(authorized_client, test_user):
-    response = authorized_client.post(
-        "/feeds/",
-        json={
-            "date": str(datetime.datetime(2023, 11, 23, 1, 24, 10)),
-            "video": "/video/",
-            "thumbnail": "thumbnail_",
-            "concentration": 80,
-        },
+def timestamp():
+    return utils.random_date().isoformat()
+
+
+@pytest.fixture
+def video_url():
+    return f"{uuid.uuid4()}.mp4"
+
+
+@pytest.fixture
+def thumbnail_url():
+    return f"{uuid.uuid4()}.jpeg"
+
+
+@pytest.fixture
+def test_feeds(session, test_user):
+    feeds = []
+    for _ in range(10):
+        data = {
+            "timestamp": utils.random_date().isoformat(),
+            "video_url": f"{uuid.uuid4()}.mp4",
+            "thumbnail_url": f"{uuid.uuid4()}.jpeg",
+        }
+
+        feed = crud.create_feed(
+            session,
+            schemas.FeedCreate(**data),
+            user_id=test_user["id"],
+        )
+
+        feeds.append({"id": feed.id, **data})
+
+    return feeds
+
+
+@pytest.fixture
+def test_feed(session, test_user):
+    data = {
+        "timestamp": utils.random_date().isoformat(),
+        "video_url": f"{uuid.uuid4()}.mp4",
+        "thumbnail_url": f"{uuid.uuid4()}.jpeg",
+    }
+
+    feed = crud.create_feed(
+        session,
+        schemas.FeedCreate(**data),
+        user_id=test_user["id"],
     )
-    assert response.status_code == 200, response.text
 
-    data = response.json()
-
-    return data
+    return {"id": feed.id, **data}

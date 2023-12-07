@@ -4,15 +4,16 @@ from pydantic import BaseModel
 
 
 class FeedBase(BaseModel):
-    date: datetime
-    video: str
-    thumbnail: str
-    concentration: int
+    timestamp: datetime
 
 
 class FeedCreate(FeedBase):
-    ...
+    video_url: str
+    thumbnail_url: str
 
 
 class FeedGet(FeedBase):
     id: int
+    video_url: str
+    thumbnail_url: str
+    concentration: float | None

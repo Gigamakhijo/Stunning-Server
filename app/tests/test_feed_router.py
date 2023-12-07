@@ -1,47 +1,125 @@
-from .. import schemas
+def test_get_thumbnail_url_success(authorized_client):
+    response = authorized_client.post("/feeds/thumbnail_url/thumbnail.jpeg")
+
+    assert response.status_code == 201, response.text
 
 
-def test_add_feed_success(authorized_client, test_feed: schemas.FeedCreate):
-    date_time = test_feed["date"]
-    date = str(date_time)
+def test_get_video_url_success(authorized_client):
+    response = authorized_client.post("/feeds/video_url/video.mp4")
 
-    response = authorized_client.post(
-        "/feeds/",
-        json={"date": date, **test_feed},
-    )
+    assert response.status_code == 201, response.text
+
+
+def test_get_feed_success(authorized_client, test_feed):
+    feed_id = test_feed["id"]
+    response = authorized_client.get(f"/feeds/{feed_id}")
 
     assert response.status_code == 200, response.text
 
+    data = response.json()
+    for key in test_feed.keys():
+        assert data[key] == test_feed[key]
 
-def test_add_feed_failed(client, test_feed: schemas.FeedCreate):
-    date_time = test_feed["date"]
-    date = str(date_time)
 
-    response = client.post(
-        "/feeds/",
-        json={"date": date, **test_feed},
-    )
+def test_unauthorized_get_feed(client, test_feed):
+    feed_id = test_feed["id"]
+    response = client.get(f"/feeds/{feed_id}")
 
     assert response.status_code == 401, response.text
 
 
-def test_get_feeds_success(authorized_client, test_feeds):
-    response = authorized_client.get("/feeds/", params={"skip": 0, "limit": 9})
-
+def test_get_all_feeds_success(authorized_client, test_feeds):
+    response = authorized_client.get(
+        "/feeds/", params={"skip": 0, "limit": len(test_feeds)}
+    )
     assert response.status_code == 200, response.text
     data = response.json()
 
-    print(data)
-    assert len(data) == 9
+    for feed, test_feed in zip(data, test_feeds):
+        for key in test_feed.keys():
+            assert feed[key] == test_feed[key]
 
 
-def test_get_feeds_failed(client):
-    response = client.get("/feeds/", params={"skip": 0, "limit": 9})
-
+def test_unauthorized_get_all_feeds(client, test_feeds):
+    response = client.get("/feeds/", params={"skip": 0, "limit": len(test_feeds)})
     assert response.status_code == 401, response.text
 
 
-def test_delete_feed_success(authorized_client, test_feed):
-    response = authorized_client.delete(f"/feeds/{test_feed['id']}")
+def test_post_feed_success(authorized_client, video_url, thumbnail_url, timestamp):
+    response = authorized_client.post(
+        "/feeds/",
+        json={
+            "video_url": video_url,
+            "thumbnail_url": thumbnail_url,
+            "timestamp": timestamp,
+        },
+    )
 
-    assert response.status_code == 204
+    def validate_response(response):
+        data = response.json()
+        assert data["video_url"] == video_url
+        assert data["thumbnail_url"] == thumbnail_url
+        assert data["timestamp"] == timestamp
+
+    assert response.status_code == 201, response.text
+    validate_response(response)
+    feed_id = response.json()["id"]
+
+    response = authorized_client.get(f"/feeds/{feed_id}")
+
+    assert response.status_code == 200, response.text
+    validate_response(response)
+
+
+def test_unauthorized_post_feed(client, video_url, thumbnail_url, timestamp):
+    response = client.post(
+        "/feeds/",
+        json={
+            "video_url": video_url,
+            "thumbnail_url": thumbnail_url,
+            "timestamp": timestamp,
+        },
+    )
+    assert response.status_code == 401, response.text
+
+
+def test_delete_post_success(authorized_client, test_feed):
+    feed_id = test_feed["id"]
+    response = authorized_client.delete(
+        f"/feeds/{feed_id}",
+    )
+    assert response.status_code == 204, response.text
+
+
+def test_unauthorized_delete_post(client, video_url, thumbnail_url, timestamp):
+    response = client.post(
+        "/feeds/",
+        json={
+            "video_url": video_url,
+            "thumbnail_url": thumbnail_url,
+            "timestamp": timestamp,
+        },
+    )
+    assert response.status_code == 401, response.text
+
+
+def test_get_feed_fail(authorized_client):
+    feed_id = 1_000_000
+    response = authorized_client.get(f"/feeds/{feed_id}")
+
+    assert response.status_code == 404, response.text
+
+
+def test_get_all_feeds_fail(authorized_client, test_feeds):
+    response = authorized_client.get(
+        "/feeds/", params={"skip": len(test_feeds), "limit": len(test_feeds) + 100}
+    )
+    assert response.status_code == 200, response.text
+    assert len(response.json()) == 0
+
+
+def test_delete_feed_fail(authorized_client):
+    feed_id = 1_000_000
+    response = authorized_client.delete(f"/feeds/{feed_id}")
+
+    assert response.status_code == 404, response.text
