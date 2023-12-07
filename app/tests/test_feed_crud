@@ -1,0 +1,26 @@
+from .. import crud, schemas
+
+import datetime
+
+def test_create_feed(session):
+    feed_create = schemas.FeedCreate(
+        datetime=datetime.datetime(2023, 11, 24, 1, 45),
+        video="/video/",
+        thumnail="thumnail_",
+        concentration=88,
+    )
+
+    feed = crud.create_feed(session, feed_create, user_id=1)
+
+    for k in ["date", "video", "thumnail", "concentration"]:
+        assert getattr(feed, k) == getattr(feed_create, k)
+
+
+def test_get_feedlist(session,test_feeds):
+    
+    response = crud.get_feeds(session, user_id=test_feeds[0].user_id, skip=0, limit=2)
+
+    for val, exp in zip(response, test_feeds):
+        for k in ["datetime", "video", "thumnail", "concentration"]:
+            assert getattr(val, k) == getattr(exp, k), k
+    
