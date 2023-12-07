@@ -32,7 +32,7 @@ def override_get_db():
         db.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def session():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
@@ -43,7 +43,7 @@ def session():
         db.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 def client(session):
     def override_get_db():
         try:
@@ -65,7 +65,7 @@ def password():
     return "fakepassword"
 
 
-@pytest.fixture()
+@pytest.fixture
 def test_user(client, email, password):
     body = {"email": email, "password": password}
 
@@ -78,7 +78,23 @@ def test_user(client, email, password):
     return data
 
 
-@pytest.fixture()
+@pytest.fixture
+def other_test_user(client, email, password):
+    email = "2" + email
+    password = "2" + password
+
+    body = {"email": email, "password": password}
+
+    response = client.post("/users/", json=body)
+    assert response.status_code == 201, response.text
+    data = response.json()
+    assert data["email"] == body["email"]
+    data["password"] = body["password"]
+
+    return data
+
+
+@pytest.fixture
 def authenticated_user(client, test_user):
     response = client.post(
         "/auth/token",
@@ -200,6 +216,44 @@ def test_feed(session, test_user):
         session,
         schemas.FeedCreate(**data),
         user_id=test_user["id"],
+    )
+
+    return {"id": feed.id, **data}
+
+
+@pytest.fixture
+def other_test_feeds(session, other_test_user):
+    feeds = []
+    for _ in range(10):
+        data = {
+            "timestamp": utils.random_date().isoformat(),
+            "video_url": f"{uuid.uuid4()}.mp4",
+            "thumbnail_url": f"{uuid.uuid4()}.jpeg",
+        }
+
+        feed = crud.create_feed(
+            session,
+            schemas.FeedCreate(**data),
+            user_id=other_test_user["id"],
+        )
+
+        feeds.append({"id": feed.id, **data})
+
+    return feeds
+
+
+@pytest.fixture
+def other_test_feed(session, other_test_user):
+    data = {
+        "timestamp": utils.random_date().isoformat(),
+        "video_url": f"{uuid.uuid4()}.mp4",
+        "thumbnail_url": f"{uuid.uuid4()}.jpeg",
+    }
+
+    feed = crud.create_feed(
+        session,
+        schemas.FeedCreate(**data),
+        user_id=other_test_user["id"],
     )
 
     return {"id": feed.id, **data}

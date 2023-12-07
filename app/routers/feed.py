@@ -91,4 +91,9 @@ def delete_feed(
             detail="feed does not exist",
         )
 
+    if feed.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Access forbidden"
+        )
+
     crud.delete_feed(db, feed_id=feed.id)

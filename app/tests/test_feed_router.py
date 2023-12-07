@@ -28,6 +28,13 @@ def test_unauthorized_get_feed(client, test_feed):
     assert response.status_code == 401, response.text
 
 
+def test_get_other_user_feed(authorized_client, other_test_feed):
+    feed_id = other_test_feed["id"]
+    response = authorized_client.get(f"/feeds/{feed_id}")
+
+    assert response.status_code == 200, response.text
+
+
 def test_get_all_feeds_success(authorized_client, test_feeds):
     response = authorized_client.get(
         "/feeds/", params={"skip": 0, "limit": len(test_feeds)}
@@ -40,9 +47,16 @@ def test_get_all_feeds_success(authorized_client, test_feeds):
             assert feed[key] == test_feed[key]
 
 
-def test_unauthorized_get_all_feeds(client, test_feeds):
+def test_unauthorized_get_feeds(client, test_feeds):
     response = client.get("/feeds/", params={"skip": 0, "limit": len(test_feeds)})
     assert response.status_code == 401, response.text
+
+
+def test_get_other_users_feeds(authorized_client, other_test_feeds):
+    response = authorized_client.get(
+        "/feeds/", params={"skip": 0, "limit": len(other_test_feeds)}
+    )
+    assert response.status_code == 200, response.text
 
 
 def test_post_feed_success(authorized_client, video_url, thumbnail_url, timestamp):
@@ -83,7 +97,7 @@ def test_unauthorized_post_feed(client, video_url, thumbnail_url, timestamp):
     assert response.status_code == 401, response.text
 
 
-def test_delete_post_success(authorized_client, test_feed):
+def test_delete_feed_success(authorized_client, test_feed):
     feed_id = test_feed["id"]
     response = authorized_client.delete(
         f"/feeds/{feed_id}",
@@ -91,7 +105,7 @@ def test_delete_post_success(authorized_client, test_feed):
     assert response.status_code == 204, response.text
 
 
-def test_unauthorized_delete_post(client, video_url, thumbnail_url, timestamp):
+def test_unauthorized_delete_feed(client, video_url, thumbnail_url, timestamp):
     response = client.post(
         "/feeds/",
         json={
@@ -101,6 +115,14 @@ def test_unauthorized_delete_post(client, video_url, thumbnail_url, timestamp):
         },
     )
     assert response.status_code == 401, response.text
+
+
+def test_delete_other_user_feed(authorized_client, other_test_feed):
+    feed_id = other_test_feed["id"]
+    response = authorized_client.delete(
+        f"/feeds/{feed_id}",
+    )
+    assert response.status_code == 403, response.text
 
 
 def test_get_feed_fail(authorized_client):
