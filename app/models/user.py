@@ -17,3 +17,4 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
 
     todos = relationship("Todo", backref="user")
+    feeds = relationship("Feed", backref="user")
