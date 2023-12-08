@@ -17,5 +17,5 @@ uvicorn app.main:app --reload
 ## Run in Production Mode
 
 ```bash
-gunicorn app.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:80
+./deployment.run 80
 ```
