@@ -21,10 +21,10 @@ class UserAuth(UserBase):
 class UserCreate(UserBase):
     password: str
     username: str | None
-    full_name: str | None
-    gender: str | None
-    phone_number: str | None
-    status_message: str | None
+    full_name: str | None = None
+    gender: str | None = None
+    phone_number: str | None = None
+    status_message: str | None = None
 
 
 class UserEdit(BaseModel):
