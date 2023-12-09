@@ -27,6 +27,11 @@ def create_user(
         user=schemas.UserCreate(
             email=user.email,
             password=user.password,
+            username=user.username,
+            full_name=user.full_name,
+            gender=user.gender,
+            phone_number=user.phone_number,
+            status_message=user.status_message,
         ),
     )
 

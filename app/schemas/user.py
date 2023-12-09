@@ -20,7 +20,7 @@ class UserAuth(UserBase):
 
 class UserCreate(UserBase):
     password: str
-    username: str | None
+    username: str | None = None
     full_name: str | None = None
     gender: str | None = None
     phone_number: str | None = None
