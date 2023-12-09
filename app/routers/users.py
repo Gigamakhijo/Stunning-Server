@@ -1,9 +1,12 @@
 from typing import Annotated
+import io
 
-from fastapi import APIRouter, Depends, HTTPException, status
+import uuid
+from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
 from sqlalchemy.orm import Session
+from ..config import settings
 
-from .. import crud, oauth2, schemas
+from .. import crud, oauth2, schemas, s3
 from ..database import get_db
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -24,6 +27,11 @@ def create_user(
         user=schemas.UserCreate(
             email=user.email,
             password=user.password,
+            username=user.username,
+            full_name=user.full_name,
+            gender=user.gender,
+            phone_number=user.phone_number,
+            status_message=user.status_message,
         ),
     )
 
@@ -48,3 +56,40 @@ def update_user(
         raise HTTPException(status_code=404, detail="User not found")
 
     return crud.update_user(db, current_user, new_user)
+
+
+@router.post("/profile_image", status_code=status.HTTP_201_CREATED)
+def create_profile_image(
+    profile_image: UploadFile,
+    current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
+    db: Session = Depends(get_db),
+):
+    object_name = f"{uuid.uuid4()}.jpeg"
+
+    s3.upload_file(profile_image.file, settings.bucket_name, object_name)
+
+    crud.update_profile_image(db, object_name, user_id=current_user.id)
+
+
+@router.put("/profile_image", status_code=status.HTTP_200_OK)
+def update_profile_image(
+    profile_image: UploadFile,
+    current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
+    db: Session = Depends(get_db),
+):
+    object_name = crud.get_user(db, user_id=current_user.id).profile_image
+
+    s3.upload_file(profile_image.file, settings.bucket_name, object_name)
+
+
+@router.get("/profile_image", status_code=status.HTTP_201_CREATED)
+def get_profile_image(
+    current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
+    db: Session = Depends(get_db),
+):
+    object_name = crud.get_user(db, user_id=current_user.id).profile_image
+    print(object_name)
+
+    url = s3.create_presigned_url(settings.bucket_name, object_name)
+
+    return url

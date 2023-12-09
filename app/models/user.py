@@ -16,5 +16,7 @@ class User(Base):
     status_message = Column(String)
     hashed_password = Column(String, nullable=False)
 
+    profile_image = Column(String)
+
     todos = relationship("Todo", backref="user")
     feeds = relationship("Feed", backref="user")
