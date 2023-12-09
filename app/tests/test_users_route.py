@@ -66,7 +66,6 @@ def test_update_user_success(authorized_client):
         json={
             "full_name": "1234",
             "username": "asdf",
-            "profile_image_url": "laskdfjalsjdfkl.jpeg",
         },
     )
 

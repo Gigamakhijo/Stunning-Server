@@ -1,12 +1,12 @@
-from typing import Annotated
 import io
-
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, status, UploadFile
-from sqlalchemy.orm import Session
-from ..config import settings
+from typing import Annotated
 
-from .. import crud, oauth2, schemas, s3
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from sqlalchemy.orm import Session
+
+from .. import crud, oauth2, s3, schemas
+from ..config import settings
 from ..database import get_db
 
 router = APIRouter(prefix="/users", tags=["users"])
