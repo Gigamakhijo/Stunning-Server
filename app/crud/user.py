@@ -29,7 +29,13 @@ def get_user_by_email(db: Session, email: str):
 
 
 def update_user(db: Session, user: schemas.UserGet, new_user: schemas.UserEdit):
-    db.query(models.User).filter(models.User.id == user.id).update(new_user.dict())
+    new_row = new_user.dict(exclude_unset=True)
+    if "password" in new_row.keys():
+        hashed_password = oauth2.get_password_hash(new_row["password"])
+        new_row.pop("password")
+        new_row["hashed_password"] = hashed_password
+
+    db.query(models.User).filter(models.User.id == user.id).update(new_row)
     db.commit()
 
     return get_user(db, user.id)
