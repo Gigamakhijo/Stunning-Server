@@ -1,4 +1,5 @@
 import datetime
+import tempfile
 import uuid
 
 import pytest
@@ -66,14 +67,27 @@ def password():
 
 
 @pytest.fixture
-def test_user(client, email, password):
+def profile_image():
+    with tempfile.NamedTemporaryFile(mode="w+b") as jpg:
+        jpg.write(b"Hello World!")
+
+        jpg.seek(0)
+
+        yield jpg
+
+
+@pytest.fixture
+def test_user(client, email, password, profile_image):
     body = {"email": email, "password": password}
 
     response = client.post("/users/", json=body)
     assert response.status_code == 201, response.text
     data = response.json()
     assert data["email"] == body["email"]
-    data["password"] = body["password"]
+
+    response = client.post(
+        "/users/profile_image", files={"profile_image": profile_image}
+    )
 
     return data
 
