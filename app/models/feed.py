@@ -16,4 +16,4 @@ class Feed(Base):
     concentration = Column(Float, nullable=True)
 
     user_id = Column(Integer, ForeignKey("users.id"))
-    users = relationship("User", back_populates="feeds")
+    users = relationship("User", backref="feeds")
