@@ -88,8 +88,9 @@ def get_profile_image(
     db: Session = Depends(get_db),
 ):
     object_name = crud.get_user(db, user_id=current_user.id).profile_image
-    print(object_name)
+
+    if object_name is None:
+        raise HTTPException(status_code=404, detail="Profile image not found")
 
     url = s3.create_presigned_url(settings.bucket_name, object_name)
-
     return url
