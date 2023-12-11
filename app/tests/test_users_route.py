@@ -83,7 +83,7 @@ def test_update_user_success(authorized_client, email):
 
 
 def test_user_search(authorized_client, other_test_user):
-    response = authorized_client.get(f"/users/{other_test_user['username']}")
+    response = authorized_client.get(f"/users/?user_name={other_test_user['username']}")
     assert response.status_code == 200, response.text
 
     data = response.json()

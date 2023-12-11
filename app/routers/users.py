@@ -96,9 +96,7 @@ def get_profile_image(
     return url
 
 
-@router.get(
-    "/{user_name}", response_model=schemas.UserGet, status_code=status.HTTP_200_OK
-)
+@router.get("/", response_model=schemas.UserGet, status_code=status.HTTP_200_OK)
 def search_user(
     user_name: str,
     current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
