@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class FollowBase(BaseModel):
-    followee_id: int
+    follower_id: int
 
 
 class FollowCreate(FollowBase):
@@ -12,4 +12,4 @@ class FollowCreate(FollowBase):
 
 
 class FollowGet(FollowBase):
-    pending: bool
+    ...
