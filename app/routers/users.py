@@ -96,18 +96,16 @@ def get_profile_image(
 
 
 @router.get(
-    "/{user_name}", response_model=List[schemas.UserGet], status_code=status.HTTP_200_OK
+    "/{user_name}", response_model=schemas.UserGet, status_code=status.HTTP_200_OK
 )
 def search_user(
     user_name: str,
     current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
-    skip: int = 0,
-    limit: int = 100,
     db: Session = Depends(get_db),
 ):
-    return (
-        db.query(models.User)
-        .filter(models.User.username.ilike(f"%{user_name}%"))
-        .slice(skip, limit)
-        .all()
-    )
+    row = db.query(models.User).filter(models.User.username == user_name).first()
+
+    if row is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return row
