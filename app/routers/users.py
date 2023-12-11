@@ -83,10 +83,11 @@ def update_profile_image(
 
 @router.get("/profile_image", status_code=status.HTTP_201_CREATED)
 def get_profile_image(
+    user_id: int,
     current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
     db: Session = Depends(get_db),
 ):
-    object_name = crud.get_user(db, user_id=current_user.id).profile_image
+    object_name = crud.get_user(db, user_id=user_id).profile_image
 
     if object_name is None:
         raise HTTPException(status_code=404, detail="Profile image not found")
@@ -95,9 +96,7 @@ def get_profile_image(
     return url
 
 
-@router.get(
-    "/{user_name}", response_model=schemas.UserGet, status_code=status.HTTP_200_OK
-)
+@router.get("/", response_model=schemas.UserGet, status_code=status.HTTP_200_OK)
 def search_user(
     user_name: str,
     current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
