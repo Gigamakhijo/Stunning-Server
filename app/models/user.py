@@ -1,7 +1,14 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Table
 from sqlalchemy.orm import relationship
 
 from ..database import Base
+
+follows = Table(
+    "follows",
+    Base.metadata,
+    Column("follower_id", ForeignKey("users.id"), primary_key=True),
+    Column("following_id", ForeignKey("users.id"), primary_key=True),
+)
 
 
 class User(Base):
@@ -18,5 +25,10 @@ class User(Base):
 
     profile_image = Column(String)
 
-    todos = relationship("Todo", backref="user")
-    feeds = relationship("Feed", backref="user")
+    followers = relationship(
+        "User",
+        secondary="follows",
+        primaryjoin="User.id==follows.c.following_id",
+        secondaryjoin="User.id==follows.c.follower_id",
+        backref="following",
+    )
