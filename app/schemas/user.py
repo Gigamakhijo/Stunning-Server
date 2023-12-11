@@ -29,6 +29,7 @@ class UserCreate(UserBase):
 
 class UserEdit(BaseModel):
     username: str | None = None
+    password: str | None = None
     full_name: str | None = None
     gender: str | None = None
     phone_number: str | None = None

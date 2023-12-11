@@ -60,17 +60,23 @@ def test_get_current_user(authorized_client, test_user):
         assert data[key] == test_user[key]
 
 
-def test_update_user_success(authorized_client):
+def test_update_user_success(authorized_client, email):
     response = authorized_client.put(
         "/users/me",
         json={
-            "full_name": "1234",
-            "username": "asdf",
+            "username": "5678",
+            "password": "5678",
+            "full_name": "5678",
         },
     )
 
     assert response.status_code == 200, response.text
     data = response.json()
 
-    assert data["full_name"] == "1234"
-    assert data["username"] == "asdf"
+    assert data["full_name"] == "5678"
+    assert data["username"] == "5678"
+
+    response = authorized_client.post(
+        "/auth/token", data={"username": email, "password": "5678"}
+    )
+    assert response.status_code == 200, response.text
