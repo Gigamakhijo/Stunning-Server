@@ -83,10 +83,10 @@ def update_profile_image(
 
 @router.get("/profile_image", status_code=status.HTTP_201_CREATED)
 def get_profile_image(
-    current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
+    user_id: int,
     db: Session = Depends(get_db),
 ):
-    object_name = crud.get_user(db, user_id=current_user.id).profile_image
+    object_name = crud.get_user(db, user_id=user_id).profile_image
 
     if object_name is None:
         raise HTTPException(status_code=404, detail="Profile image not found")
