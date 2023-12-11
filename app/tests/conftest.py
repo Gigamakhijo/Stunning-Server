@@ -78,12 +78,13 @@ def profile_image():
 
 @pytest.fixture
 def test_user(client, email, password, profile_image):
-    body = {"email": email, "password": password}
+    body = {"email": email, "password": password, "username": "testuser"}
 
     response = client.post("/users/", json=body)
     assert response.status_code == 201, response.text
     data = response.json()
     assert data["email"] == body["email"]
+    data["username"] = "testuser"
 
     response = client.post(
         "/users/profile_image", files={"profile_image": profile_image}
@@ -97,13 +98,14 @@ def other_test_user(client, email, password):
     email = "2" + email
     password = "2" + password
 
-    body = {"email": email, "password": password}
+    body = {"email": email, "password": password, "username": "testuser1"}
 
     response = client.post("/users/", json=body)
     assert response.status_code == 201, response.text
     data = response.json()
     assert data["email"] == body["email"]
     data["password"] = body["password"]
+    data["username"] = "testuser1"
 
     return data
 

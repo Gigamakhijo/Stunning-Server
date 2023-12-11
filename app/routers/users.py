@@ -1,10 +1,10 @@
 import uuid
-from typing import Annotated
+from typing import Annotated, List
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
-from .. import crud, oauth2, s3, schemas
+from .. import crud, models, oauth2, s3, schemas
 from ..config import settings
 from ..database import get_db
 
@@ -93,3 +93,21 @@ def get_profile_image(
 
     url = s3.create_presigned_url(settings.bucket_name, object_name)
     return url
+
+
+@router.get(
+    "/{user_name}", response_model=List[schemas.UserGet], status_code=status.HTTP_200_OK
+)
+def search_user(
+    user_name: str,
+    current_user: Annotated[schemas.UserGet, Depends(oauth2.get_authenticated_user)],
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(get_db),
+):
+    return (
+        db.query(models.User)
+        .filter(models.User.username.ilike(f"%{user_name}%"))
+        .slice(skip, limit)
+        .all()
+    )

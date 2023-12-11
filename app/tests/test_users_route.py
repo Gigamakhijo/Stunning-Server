@@ -56,7 +56,7 @@ def test_get_current_user(authorized_client, test_user):
     assert response.status_code == 200, response.text
     data = response.json()
 
-    for key in test_user.keys():
+    for key in data.keys():
         assert data[key] == test_user[key]
 
 
@@ -80,3 +80,12 @@ def test_update_user_success(authorized_client, email):
         "/auth/token", data={"username": email, "password": "5678"}
     )
     assert response.status_code == 200, response.text
+
+
+def test_user_search(authorized_client, other_test_user):
+    print(other_test_user)
+    response = authorized_client.get(f"/users/{other_test_user['username']}")
+    assert response.status_code == 200, response.text
+
+    data = response.json()
+    assert len(data) == 1
