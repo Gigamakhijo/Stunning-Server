@@ -59,6 +59,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 def decode_access_token(token: str) -> schemas.TokenData:
     payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
     email: str = payload.get("sub")
+    expire = payload.get("exp")
 
     return schemas.TokenData(email=email)
 
