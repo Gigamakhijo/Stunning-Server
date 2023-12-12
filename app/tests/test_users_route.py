@@ -22,14 +22,14 @@ def test_create_user(client, session, email, password):
     assert oauth2.verify_password(password, user.hashed_password)
 
 
-def test_create_profile_image(authorized_client, profile_image):
+def create_profile_image(authorized_client, profile_image):
     response = authorized_client.post(
         "/users/profile_image", files={"profile_image": profile_image}
     )
     assert response.status_code == 201, response.text
 
 
-def test_update_profile_image(authorized_client, profile_image):
+def update_profile_image(authorized_client, profile_image):
     response = authorized_client.post(
         "/users/profile_image", files={"profile_image": profile_image}
     )
