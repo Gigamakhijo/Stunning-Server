@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    database_hostname: str = "hostname"
+    database_hostname: str = "sqlite.db"
     secret_key: str = "secret_key"
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 100000
