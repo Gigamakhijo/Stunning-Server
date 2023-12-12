@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     database_hostname: str = "hostname"
     secret_key: str = "secret_key"
-    algorithm: str = "algorithm"
+    algorithm: str = "HS256"
     access_token_expire_minutes: int = 100000
     aws_region: str = "region"
     bucket_name: str = "bucket_name"
