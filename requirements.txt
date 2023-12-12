@@ -8,6 +8,7 @@ sqlalchemy==1.4.*
 boto3
 pydantic-settings
 python-dotenv
+numpy
 
 pytest
 pytest-xdist
