@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+gunicorn
+python-multipart
+python-jose
+passlib[bcrypt]
+boto3
+pydantic-settings
+python-dotenv
+numpy
+mysql-connector-python
+
+pytest
+pytest-xdist
+pytest-cov
+httpx
+ruff
