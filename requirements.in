@@ -4,11 +4,11 @@ gunicorn
 python-multipart
 python-jose
 passlib[bcrypt]
-sqlalchemy==1.4.*
 boto3
 pydantic-settings
 python-dotenv
 numpy
+mysql-connector-python
 
 pytest
 pytest-xdist

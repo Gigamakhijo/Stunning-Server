@@ -6,27 +6,24 @@ from pydantic import BaseModel
 
 class TodoBase(BaseModel):
     date: datetime
-    icon: str
     title: str
     contents: str
-    color: str
-    done: bool
+    place: str
+    due_date: datetime
+    is_completed: bool
 
 
 class TodoGet(TodoBase):
     id: int
-    user_id: int
 
 
 class TodoCreate(TodoBase):
-    ...
+    user_id: int
 
 
 class TodoEdit(TodoCreate):
-    class Config:
-        orm_mode = True
-        from_attributes = True
+    pass
 
 
 class TodoListGet(BaseModel):
-    todolist: List[TodoGet]
+    todos: List[TodoGet]
