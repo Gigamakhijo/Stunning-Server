@@ -2,14 +2,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    database_hostname: str = "sqlite.db"
-    secret_key: str = "secret_key"
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 100000
-    aws_region: str = "region"
-    bucket_name: str = "bucket_name"
-    aws_access_key_id: str = "access_key_id"
-    aws_secret_access_key: str = "secret_access_key"
+    mysql_host: str = "127.0.0.1"
+    mysql_user: str = "MYSQL_USRER"
+    mysql_password: str = "MYSQL_PASSWORD"
+    mysql_db: str = "MYSQL_DB"
 
     model_config = SettingsConfigDict(env_file=".env")
 

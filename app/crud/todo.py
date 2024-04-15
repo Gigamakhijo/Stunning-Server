@@ -1,56 +1,43 @@
-import datetime
+from mysql.connector.connection import MySQLConnection
 
-from sqlalchemy.orm import Session
-
-from .. import models, schemas
+from .. import schemas
 
 
-def create_todo(db: Session, todo: schemas.TodoCreate, user_id: int):
-    db_todo = models.Todo(
-        date=todo.date,
-        icon=todo.icon,
-        title=todo.title,
-        contents=todo.contents,
-        color=todo.color,
-        done=todo.done,
-        user_id=user_id,
+def create_todo(conn: MySQLConnection, todo: schemas.TodoCreate, user_id: int):
+    cursor = conn.cursor()
+
+    query = """
+    INSERT INTO todo (date, title, contents, place, due_date, is_completed, user_id)
+    VALUES (%s, %s, %s, %s, %s, %s, %s);
+    """
+
+    values = (
+        todo.date,
+        todo.title,
+        todo.contents,
+        todo.place,
+        todo.due_date,
+        todo.is_completed,
+        user_id,
     )
+    cursor.execute(query, values)
 
-    db.add(db_todo)
-    db.commit()
-    db.refresh(db_todo)
-
-    return db_todo
+    conn.commit()
+    return todo
 
 
-def get_todos_by_date(
-    db: Session, date: datetime.date, user_id: int, skip: int = 0, limit: int = 100
-):
-    return (
-        db.query(models.Todo)
-        .filter(
-            models.Todo.user_id == user_id,
-            models.Todo.date >= date,
-            models.Todo.date < date + datetime.timedelta(days=1),
-        )
-        .slice(skip, limit)
-        .all()
-    )
+def get_todo(conn: MySQLConnection, user_id: int):
+    cursor = conn.cursor(dictionary=True)
+    query = """
+    SELECT id, date, title, contents, place, due_date, is_completed
+    FROM todo
+    WHERE user_id = %s;
+    """
+    values = (user_id,)
+    cursor.execute(query, values)
 
+    todos = []
+    for row in cursor:
+        todos.append(row)
 
-def update_todo(db: Session, todo: schemas.TodoEdit, todo_id: int):
-    db.query(models.Todo).filter(models.Todo.id == todo_id).update(todo.dict())
-    db.commit()
-
-    return get_todo(db, todo_id)
-
-
-def delete_todo(db: Session, todo_id: int):
-    row = db.query(models.Todo).filter(models.Todo.id == todo_id).first()
-    db.delete(row)
-
-    db.commit()
-
-
-def get_todo(db: Session, todo_id: int):
-    return db.query(models.Todo).filter(models.Todo.id == todo_id).first()
+    return {"todos": todos}
