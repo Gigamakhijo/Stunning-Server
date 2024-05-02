@@ -2,8 +2,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    mysql_host: str = "127.0.0.1"
-    mysql_user: str = "MYSQL_USRER"
+    mysql_host: str = "localhost"
+    mysql_user: str = "MYSQL_USER"
     mysql_password: str = "MYSQL_PASSWORD"
     mysql_db: str = "MYSQL_DB"
 
