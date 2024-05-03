@@ -14,10 +14,10 @@ async def startup_event():
     init_challenge_db(conn)
 
     
-@router.post("/", status_code=status.HTTP_200_OK)
+@router.post("/", status_code=status.HTTP_200_OK)#완
 async def create_challenge(
-    challenge: schemas.ChallengeCreate,
-    conn: MySQLConnection = Depends(get_conn)
+    challenge:schemas.ChallengeCreate,
+    conn:MySQLConnection = Depends(get_conn)
 ):
     
     result = crud.create_challenge(conn, challenge, user_id=0)
@@ -25,9 +25,9 @@ async def create_challenge(
     return result
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)#완
 async def delete_challenge (
-    id:int, #challenge의 id
+    id:int,
     conn: MySQLConnection = Depends(get_conn),
 ):
     
@@ -36,13 +36,13 @@ async def delete_challenge (
     if challenge is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"challenge with id:{id} does not exist",
+            detail=f"challenge with id: {id} does not exist",
         )
     
     crud.delete_challenge(conn, id)
 
 
-@router.get("/", response_model= schemas.ChallengeListGet, status_code=status.HTTP_200_OK)#하나의 챌린지 겟
+@router.get("/", response_model= schemas.ChallengeListGet, status_code=status.HTTP_200_OK)#완
 async def get_challenge(
     date:datetime.date,
     days_left:int,
@@ -54,7 +54,7 @@ async def get_challenge(
     return crud.get_challenges_by_date(conn, date, days_left, first, amount, user_id=0)
     
 
-@router.put("/{id}", response_model=schemas.ChallengeGet)
+@router.put("/{id}", response_model=schemas.ChallengeGet)#완
 async def update_challenge(
     id:int,
     new_challenge:schemas.ChallengeEdit,

@@ -19,6 +19,7 @@ def init_todo_db(conn: MySQLConnection):
     )
     """
     cursor.execute(query)
+    #cursor.execute("ALTER TABLE todo AUTO_INCREMENT = 1;")
 
 
 def init_challenge_db(conn: MySQLConnection):
@@ -43,7 +44,7 @@ def init_comment_db(conn: MySQLConnection):
         id INT AUTO_INCREMENT PRIMARY KEY,
         date DATETIME,
         contents VARCHAR(30),
-        title VARCHAR(20),
+        title VARCHAR(30),
         user_id INT
     )
     """

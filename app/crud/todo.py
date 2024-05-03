@@ -6,6 +6,7 @@ import datetime
 
 
 def create_todo(conn: MySQLConnection, todo: schemas.TodoCreate, user_id: int):
+
     cursor = conn.cursor()
 
     query = """
@@ -30,24 +31,29 @@ def create_todo(conn: MySQLConnection, todo: schemas.TodoCreate, user_id: int):
     return todo
 
 
-#여기서 user_id는 todo다 갖고오기 위해서, 임박한거 10개만 갖고오기 
 def get_todos_by_date(conn: MySQLConnection, date:datetime.date, days_left:int, first:int, amount:int, user_id: int): 
 
     cursor = conn.cursor(dictionary=True)
 
-    duration = date + datetime.timedelta(days=1)
+    duration = date + datetime.timedelta(days=days_left)
+
+    #duration의 00:00:00
+    duration_start = datetime.datetime.combine(duration, datetime.time.min)
+
+    #duration의 23:59:59
+    duration_end = datetime.datetime.combine(duration, datetime.time.max)
  
     query = """
     SELECT date, due_date, title, contents, place, is_completed, id
     FROM todo
     WHERE user_id = %s
     AND due_date >= %s
-    AND due_date < %s 
+    AND due_date <= %s 
     ORDER BY due_date ASC
     LIMIT %s, %s
     """
     
-    values = (user_id, date, duration, first, amount)
+    values = (user_id, duration_start, duration_end, first, amount)
 
     cursor.execute(query, values)
 
@@ -58,30 +64,24 @@ def get_todos_by_date(conn: MySQLConnection, date:datetime.date, days_left:int, 
     return {"todos": todo_dict} #todos를 튜플의 리스트로 넣음
 
 
-#여기서 todo_id는 특정 todo하나만 갖고오기 위해
-def get_todo(conn: MySQLConnection, todo_id:int): #리턴형태는 todoget
+#여기서 todo_id는 특정 todo하나만 
+def get_todo(conn: MySQLConnection, todo_id:int): 
 
-    cursor=conn.cursor()
+    cursor=conn.cursor(dictionary=True)
 
-    query="SELECT * FROM todo WHERE id= %s"
-    #query="""
-    #SELECT date, due_date, title, contents, place, is_completed, id
-    #FROM todo 
-    #WHERE id = %s
-    #"""
+    query="""
+    SELECT date, due_date, title, contents, place, is_completed, id
+    FROM todo 
+    WHERE id = %s
+    """
 
     cursor.execute(query,(todo_id,))
 
-    todo=cursor.fetchone()
+    todo = cursor.fetchone()
 
-    keys = ["date","due_date","title","contents","place","is_completed","id"]
+    return todo
 
-    todo_dict={}
 
-    for key, value in zip(keys, todo):
-        todo_dict[key]=value
-
-    return todo_dict 
 
 
 def update_todo(conn : MySQLConnection, todo_id : int, new_todo : schemas.TodoEdit):
@@ -116,7 +116,7 @@ def delete_todo(conn: MySQLConnection, todo_id:int):
     
     cursor=conn.cursor()
 
-    query="DELETE FROM todo WHERE id=%s"
+    query="DELETE FROM todo WHERE id = %s"
 
     cursor.execute(query,(todo_id,))
 
