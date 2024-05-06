@@ -1,39 +1,33 @@
 from datetime import datetime
-from pydantic import BaseModel
 from typing import List
 
+from pydantic import BaseModel
 
-class ChallengeBase(BaseModel): 
-    date:datetime
-    due_date:datetime
-    title:str
-    is_completed:bool
+
+class ChallengeBase(BaseModel):
+    date: datetime
+    due_date: datetime
+    title: str
+    is_completed: bool
+
 
 class ChallengeCreate(ChallengeBase):
-    user_id:int 
-   
+    user_id: int
+
 
 class ChallengeGet(ChallengeBase):
-    id:int
-    user_id:int
+    id: int
+    user_id: int
 
-class ChallengeEdit(ChallengeBase):
-    ...
+
+class ChallengeEdit(ChallengeBase): ...
 
 
 class ChallengeListGet(BaseModel):
-    challenges:List[ChallengeGet]
-
-                                                                               
-
-class ChallengeDelete(ChallengeBase):
-    ...
+    challenges: List[ChallengeGet]
 
 
-class GetChallenge(ChallengeBase):
-    ...
+class ChallengeDelete(ChallengeBase): ...
 
 
-
-    
-
+class GetChallenge(ChallengeBase): ...

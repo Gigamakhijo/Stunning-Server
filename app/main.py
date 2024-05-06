@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 
-from .routers import todos
-from .routers import challenges
-from .routers import comments
+from .routers import challenges, comments, todos
 
 app = FastAPI()
 

@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class TodoBase(BaseModel):
     date: datetime
     due_date: datetime
-    title: str 
+    title: str
     contents: str
     place: str
     is_completed: bool
@@ -15,13 +15,13 @@ class TodoBase(BaseModel):
 
 class TodoGet(TodoBase):
     id: int
-    
+
 
 class TodoCreate(TodoBase):
     user_id: int
 
-class TodoEdit(TodoBase):
-    ...
+
+class TodoEdit(TodoBase): ...
 
 
 class TodoListGet(BaseModel):
