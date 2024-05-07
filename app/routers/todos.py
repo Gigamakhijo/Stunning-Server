@@ -1,54 +1,50 @@
 import datetime
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from mysql.connector.connection import MySQLConnection
 
-from .. import crud, oauth2, schemas
-from ..database import get_db
+from .. import crud, schemas
+from ..database import connect, get_conn, init_todo_db
 
 router = APIRouter(prefix="/todos", tags=["todos"])
 
 
-@router.post("/", response_model=schemas.TodoGet, status_code=status.HTTP_200_OK)
-def create_todo(
-    current_user: Annotated[schemas.UserAuth, Depends(oauth2.get_authenticated_user)],
+@router.on_event("startup")
+async def startup_event():
+    conn = connect()
+    init_todo_db(conn)
+
+
+@router.post("/", status_code=status.HTTP_200_OK)
+async def create_todo(
     todo: schemas.TodoCreate,
-    db: Session = Depends(get_db),
+    conn: MySQLConnection = Depends(get_conn),
 ):
-    if current_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
+    result = crud.create_todo(conn, todo, todo.user_id)
 
-    return crud.create_todo(db, todo, user_id=current_user.id)
+    return result
 
 
-@router.get("/", status_code=status.HTTP_200_OK)
-def get_todos(
-    current_user: Annotated[schemas.UserAuth, Depends(oauth2.get_authenticated_user)],
+@router.get(
+    "/", response_model=schemas.TodoListGet, status_code=status.HTTP_200_OK
+)  # 완
+async def get_todos(
     date: datetime.date,
-    skip: int = 0,
-    limit: int = 100,
-    db: Session = Depends(get_db),
+    days_left: int,
+    first: int,
+    amount: int,
+    conn: MySQLConnection = Depends(get_conn),
 ):
-    if current_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    return crud.get_todos_by_date(
-        db, date, skip=skip, limit=limit, user_id=current_user.id
-    )
+    return crud.get_todos_by_date(conn, date, days_left, first, amount, user_id=0)
 
 
-@router.put("/{id}", response_model=schemas.TodoGet)
-def update_todo(
+@router.put("/{id}", response_model=schemas.TodoGet)  # 완
+async def update_todo(
     id: int,
-    current_user: Annotated[schemas.UserAuth, Depends(oauth2.get_authenticated_user)],
     new_todo: schemas.TodoEdit,
-    db: Session = Depends(get_db),
+    conn: MySQLConnection = Depends(get_conn),
 ):
-    if current_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    todo = crud.get_todo(db, id)
+    todo = crud.get_todo(conn, id)
 
     if todo is None:
         raise HTTPException(
@@ -56,19 +52,15 @@ def update_todo(
             detail=f"todo with id: {id} does not exist",
         )
 
-    return crud.update_todo(db, new_todo, todo_id=todo.id)
+    return crud.update_todo(conn, id, new_todo)
 
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_todo(
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)  # 완
+async def delete_todo(
     id: int,
-    current_user: Annotated[schemas.UserAuth, Depends(oauth2.get_authenticated_user)],
-    db: Session = Depends(get_db),
+    conn: MySQLConnection = Depends(get_conn),
 ):
-    if current_user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-
-    todo = crud.get_todo(db, id)
+    todo = crud.get_todo(conn, id)
 
     if todo is None:
         raise HTTPException(
@@ -76,4 +68,4 @@ def delete_todo(
             detail=f"todo with id: {id} does not exist",
         )
 
-    crud.delete_todo(db, todo.id)
+    crud.delete_todo(conn, id)

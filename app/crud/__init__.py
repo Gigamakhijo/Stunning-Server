@@ -1,4 +1,3 @@
-from .feed import *
+from .challenge import *
+from .comment import *
 from .todo import *
-from .upload import *
-from .user import *
