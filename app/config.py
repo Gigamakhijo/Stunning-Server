@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from functools import lru_cache
 
 
 class Settings(BaseSettings):
@@ -11,3 +12,18 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+class AuthSettings(BaseSettings):
+    auth0_domain: str
+    auth0_api_audience: str
+    auth0_issuer: str
+    auth0_algorithms: str
+
+    class Config:
+        env_file = ".env"
+
+
+@lru_cache
+def get_auth_settings():
+    return AuthSettings()
