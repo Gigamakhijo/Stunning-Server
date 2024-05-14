@@ -9,6 +9,7 @@ pydantic-settings
 python-dotenv
 numpy
 mysql-connector-python
+jwt
 
 pytest
 pytest-xdist
