@@ -1,0 +1,16 @@
+#읽기/쓰기 모드(headless임 각 pod에 따로 접근하기 위해서)
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-write
+  labels:
+    app: db
+    app.kubernetes.io/name: db
+spec:
+  ports:
+  - name: mysql
+    port: 3306
+  clusterIP: None #쓰기 작업이나 업데이트 위해서는 pod이름으로 접근해야함
+  selector:
+    app: db
+    app.kubernetes.io/name: db

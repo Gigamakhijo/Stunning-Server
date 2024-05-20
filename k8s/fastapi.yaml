@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: stunning
+spec:
+  selector:
+    app: stunning
+  type: LoadBalancer
+  ports: #nodeport는 알아서 정해짐
+    - port: 80 #service의 포트임 # 80포트로 연결이 요청되면 pod의 컨테이너 포트인 80으로 연결된다는 의미
+      targetPort: 80 #fastapi pod의 컨테이너 포트
+      nodePort: 32000
+---
+#deployment(ReplicaSet) + pod생성
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stunning
+  labels:
+    app: mysql-label
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-label
+  template:
+    metadata:
+      labels:
+        app: mysql-label
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: stunning-container
+        image: chaeyun11/stunning-image:latest
+        imagePullPolicy: Always
+        env:
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: database-name
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: user-username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysql-secret
+                key: user-password
+          - name: DB_HOST
+            value: mysql:3306
+
+        ports:
+          - containerPort: 80
+---
+apiVersion: v1
+kind: Secret
+data:
+  root-password: cGFzc3dvcmQK #password
+  database-name: c3R1bm5pbmcK #stunning
+  user-username: dXNlcgo= #user
+  user-password: MDAwMAo= #0000
+metadata:
+  name: mysql-secret
+
+        
+
+
+
+

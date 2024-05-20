@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: PersistentVolume #pv생성(걍 볼륨임)
+metadata:
+  name: mysql-pv-volume #pv이름
+  labels:
+    type: local
+spec:
+  storageClassName: manual #특정 스토리지 클래스 있는 pv는 해당 스토리지 클래스에 맞는 pvc만 연결됨
+  capacity:
+    storage: 250Gi
+  accessModes:
+    - ReadWriteOnce #읽기 쓰기모드 #하나의 pod에서만 읽고 쓸수있다
+  hostPath:
+    path: "/mnt/data" #스토리지 연결할 path, 이 볼륨 마운트시킬 로컬서버 경로 설정
+  persistentVolumeReclaimPolicy: Retain #pv그대로 보존 # 사용이 끝난 pvc는 삭제되고 pvc를 사용하던 pv를 어떻게 할지 
+---
+#주요 필드는 pv에서 설정한 필드랑 유사
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  labels:
+    app: mysql-label
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 250Gi #자원을 얼마나 사용할 것인지 요청
+                    # 필드 값 설정할때 위에 만든 pv의 용량 초과하면 안됨
+  storageClassName: manual #pv랑 같게 하기
