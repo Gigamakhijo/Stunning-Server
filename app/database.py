@@ -19,12 +19,21 @@ def init_todo_db(conn: MySQLConnection):
     )
     """
     cursor.execute(query)
+<<<<<<< HEAD
     #cursor.execute("ALTER TABLE todo AUTO_INCREMENT = 1;")
 
 
 def init_challenge_db(conn: MySQLConnection):
     cursor=conn.cursor()
     query="""
+=======
+    # cursor.execute("ALTER TABLE todo AUTO_INCREMENT = 1;")
+
+
+def init_challenge_db(conn: MySQLConnection):
+    cursor = conn.cursor()
+    query = """
+>>>>>>> 3954c7a96d9b40a741312ef6c04b3d20d47da27b
     CREATE TABLE IF NOT EXISTS challenge(
         id INT AUTO_INCREMENT PRIMARY KEY,
         date DATETIME,
@@ -38,8 +47,13 @@ def init_challenge_db(conn: MySQLConnection):
 
 
 def init_comment_db(conn: MySQLConnection):
+<<<<<<< HEAD
     cursor=conn.cursor()
     query="""
+=======
+    cursor = conn.cursor()
+    query = """
+>>>>>>> 3954c7a96d9b40a741312ef6c04b3d20d47da27b
     CREATE TABLE IF NOT EXISTS comment(
         id INT AUTO_INCREMENT PRIMARY KEY,
         date DATETIME,
@@ -56,7 +70,11 @@ def connect():
         host=settings.mysql_host,
         user=settings.mysql_user,
         password=settings.mysql_password,
+<<<<<<< HEAD
         database=settings.mysql_db
+=======
+        database=settings.mysql_db,
+>>>>>>> 3954c7a96d9b40a741312ef6c04b3d20d47da27b
     )
     return conn
 
@@ -68,4 +86,7 @@ def get_conn():
         yield conn
     finally:
         conn.close()
+<<<<<<< HEAD
 
+=======
+>>>>>>> 3954c7a96d9b40a741312ef6c04b3d20d47da27b

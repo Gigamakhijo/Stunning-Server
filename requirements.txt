@@ -1,0 +1,6 @@
+#API
+fastapi
+uvicorn
+
+mysql-connector-python
+pydantic-settings

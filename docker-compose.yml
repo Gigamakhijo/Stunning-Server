@@ -1,0 +1,27 @@
+'''version: "3"
+
+services:
+  db:
+    image: mysql
+    container_name: mysql_container
+    ports:
+      - "3305:3306"
+    #host랑 container의 디렉토리를 연결
+    volumes:
+      - ./mysql/conf.d:/etc/mysql/conf.d
+      - ./mysql/data:/var/lib/mysql
+    env_file: .env
+    environment:
+      - TZ= Asia/Seoul
+    restart: always
+    
+  backend:
+    build: 
+      context: .
+      dockerfile: ./dockerfile
+    container_name: stunning_container
+    ports:
+      - "8000:8000"
+    restart: always
+networks:
+  server:'''
