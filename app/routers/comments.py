@@ -1,10 +1,13 @@
 import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Security
 from mysql.connector.connection import MySQLConnection
 
 from .. import crud, schemas
 from ..database import connect, get_conn, init_comment_db
+from ..auth import VerifyToken
+
+auth = VerifyToken()
 
 router = APIRouter(prefix="/comments", tags=["comments"])
 
@@ -17,7 +20,8 @@ async def startup_event():
 
 @router.post("/", status_code=status.HTTP_200_OK)  # 완
 async def create_comment(
-    comment: schemas.CommentCreate, conn: MySQLConnection = Depends(get_conn)
+    comment: schemas.CommentCreate, conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     result = crud.create_comment(conn, comment, user_id=0)
 
@@ -33,6 +37,7 @@ async def get_comments(
     first_index: int,
     amount: int,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     comment = crud.get_comments_by_date(
         first_date, last_date, first_index, amount, conn, user_id=0
@@ -45,6 +50,7 @@ async def get_comments(
 async def delete_comment(
     id: int,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     comment = crud.get_comment(id, conn)
 
@@ -62,6 +68,7 @@ async def update_comment(
     id: int,
     update_comment: schemas.CommentEdit,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     comment = crud.get_comment(id, conn)
 

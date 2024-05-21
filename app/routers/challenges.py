@@ -1,10 +1,14 @@
 import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Security
 from mysql.connector.connection import MySQLConnection
 
 from .. import crud, schemas
 from ..database import connect, get_conn, init_challenge_db
+
+from ..auth import VerifyToken
+
+auth = VerifyToken()
 
 router = APIRouter(prefix="/challenges", tags=["challenges"])
 
@@ -17,7 +21,8 @@ async def startup_event():
 
 @router.post("/", status_code=status.HTTP_200_OK)  # 완
 async def create_challenge(
-    challenge: schemas.ChallengeCreate, conn: MySQLConnection = Depends(get_conn)
+    challenge: schemas.ChallengeCreate, conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     result = crud.create_challenge(conn, challenge, user_id=0)
 
@@ -28,6 +33,7 @@ async def create_challenge(
 async def delete_challenge(
     id: int,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     challenge = crud.get_challenge(conn, id)
 
@@ -49,6 +55,7 @@ async def get_challenge(
     first: int,
     amount: int,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     return crud.get_challenges_by_date(conn, date, days_left, first, amount, user_id=0)
 
@@ -58,6 +65,7 @@ async def update_challenge(
     id: int,
     new_challenge: schemas.ChallengeEdit,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     challenge = crud.get_challenge(conn, id)
 
