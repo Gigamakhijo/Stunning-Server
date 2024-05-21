@@ -19,7 +19,6 @@ def init_todo_db(conn: MySQLConnection):
     )
     """
     cursor.execute(query)
-    # cursor.execute("ALTER TABLE todo AUTO_INCREMENT = 1;")
 
 
 def init_challenge_db(conn: MySQLConnection):

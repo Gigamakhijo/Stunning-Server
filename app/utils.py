@@ -3,7 +3,7 @@ from typing import Optional
 
 import jwt
 import numpy as np
-from config import get_auth_settings
+from .config import settings
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, SecurityScopes
 
@@ -30,9 +30,8 @@ class UnauthenticatedException(HTTPException):
 
 class VerifyToken:
     def __init__(self):
-        self.config = get_settings()
-        jwks_url = f"https://{self.config.auth0_domain}/.well-known/jwks.json"
-        self.jwks_client = jwt.PyJWKClient(jwks_url)
+        jsonurl = f"https://{settings.auth0_domain}/.well-known/jwks.json"
+        self.jwks_client = jwt.PyJWKClient(jsonurl)
 
     async def verify(
         self,
@@ -55,9 +54,9 @@ class VerifyToken:
             payload = jwt.decode(
                 token.credentials,
                 signing_key,
-                algorithms=self.config.auth0_algorithms,
-                audience=self.config.auth0_api_audience,
-                issuer=self.config.auth0_issuer,
+                algorithms=settings.auth0_algorithms,
+                audience=settings.auth0_api_audience,
+                issuer=settings.auth0_issuer,
             )
         except Exception as error:
             raise UnauthroizedException(str(error))
