@@ -1,11 +1,13 @@
 import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Security
 from mysql.connector.connection import MySQLConnection
 
 from .. import crud, schemas
 from ..database import connect, get_conn, init_todo_db
+from ..auth import VerifyToken
 
+auth = VerifyToken()
 router = APIRouter(prefix="/todos", tags=["todos"])
 
 
@@ -19,6 +21,7 @@ async def startup_event():
 async def create_todo(
     todo: schemas.TodoCreate,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     result = crud.create_todo(conn, todo, todo.user_id)
 
@@ -34,6 +37,7 @@ async def get_todos(
     first: int,
     amount: int,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     return crud.get_todos_by_date(conn, date, days_left, first, amount, user_id=0)
 
@@ -43,6 +47,7 @@ async def update_todo(
     id: int,
     new_todo: schemas.TodoEdit,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     todo = crud.get_todo(conn, id)
 
@@ -59,6 +64,7 @@ async def update_todo(
 async def delete_todo(
     id: int,
     conn: MySQLConnection = Depends(get_conn),
+    auth_result: str = Security(auth.verify)
 ):
     todo = crud.get_todo(conn, id)
 

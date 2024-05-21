@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Security
 
-from ..utils import VerifyToken
+from ..auth import VerifyToken
 
 router = APIRouter(prefix="/auth", tags="auth")
 
