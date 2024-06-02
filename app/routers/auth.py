@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Security
 
-from ..auth import VerifyToken
+from ..auth import VerifyToken, UserInfo
 
 router = APIRouter(prefix="/auth", tags="auth")
 
 auth = VerifyToken()
-
+info = UserInfo()
 
 @router.get("/api/public")
 def public():
@@ -24,4 +24,5 @@ def public():
 
 @router.get("/api/private")
 def private(auth_result: str = Security(auth.verify)):
+    info.get_userinfo()
     return auth_result

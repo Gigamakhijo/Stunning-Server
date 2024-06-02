@@ -3,8 +3,7 @@ import jwt
 from .config import settings
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer, SecurityScopes
-
-
+import requests
 
 class UnauthroizedException(HTTPException):
     def __init__(self, detail: str, **kwargs):
@@ -52,3 +51,23 @@ class VerifyToken:
             raise UnauthroizedException(str(error))
 
         return payload
+
+class UserInfo:
+     def __init__(self):
+        self.config = settings()
+        jwks_url = f'https://{self.config.auth0_domain}/.well-known/jwks.json'
+        self.jwks_client = jwt.PyJWKClient(jwks_url)
+        userinfo_url = f'https://{self.config.auth0_domain}/userinfo'
+
+     async def get_userinfo(self, security_scopes: SecurityScopes,
+                     access_token: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer())
+                     ):
+         headers = {
+            "Authorization": f"Bearer {access_token}"
+        }
+         response = requests.get(self.userinfo_url, headers=headers)
+         if response.status_code == 200:
+            userinfo = response.json()
+            print(userinfo)
+         else:
+            print(f"Failed to fetch user info: {response.status_code}")
