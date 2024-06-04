@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from pydantic import BaseModel
 
@@ -22,3 +23,7 @@ class TodoCreate(TodoBase):
 
 class TodoUpdate(TodoBase):
     pass
+
+
+class TodoListGet(BaseModel):
+    todos: List[TodoGet]
