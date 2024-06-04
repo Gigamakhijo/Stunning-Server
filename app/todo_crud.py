@@ -1,9 +1,9 @@
 from mysql.connector.connection import MySQLConnection
 
-from .. import schemas
+from . import todo_schemas
 
 
-def create_todo(conn: MySQLConnection, todo: schemas.TodoCreate, user_id: int):
+def create_todo(conn: MySQLConnection, todo: todo_schemas.TodoCreate, user_id: int):
     cursor = conn.cursor()
 
     query = """
@@ -26,8 +26,9 @@ def create_todo(conn: MySQLConnection, todo: schemas.TodoCreate, user_id: int):
     return todo
 
 
-def get_todo(conn: MySQLConnection, user_id: int):
+def read_todo(conn: MySQLConnection, user_id: int):
     cursor = conn.cursor(dictionary=True)
+
     query = """
     SELECT id, date, title, contents, place, due_date, is_completed
     FROM todo
@@ -40,4 +41,20 @@ def get_todo(conn: MySQLConnection, user_id: int):
     for row in cursor:
         todos.append(row)
 
-    return {"todos": todos}
+    return todos
+
+
+def update_todo(conn: MySQLConnection, todo_id: int, todo: todo_schemas.TodoUpdate):
+    cursor = conn.cursor(dictionary=True)
+
+    query = """
+    SELECT id, date, title, contents, place, due_date, is_completed
+    FROM todo
+    WHERE user_id = %s;
+    """
+
+    cursor.execute(query)
+
+
+def delete_todo(conn: MySQLConnection, todo_id: int):
+    raise NotImplementedError
