@@ -6,10 +6,10 @@ from pydantic import BaseModel
 
 class TodoBase(BaseModel):
     date: datetime
+    due_date: datetime
     title: str
     contents: str
     place: str
-    due_date: datetime
     is_completed: bool
 
 

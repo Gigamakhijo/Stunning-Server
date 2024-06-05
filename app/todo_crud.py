@@ -28,7 +28,7 @@ def create_todo(conn: MySQLConnection, todo: todo_schemas.TodoCreate, user_id: i
     return todo
 
 def get_todo(conn: MySQLConnection, todo_id: int):
-    cursor = conn.cursor()
+    cursor = conn.cursor(dictionary=True)
 
     query = """
     SELECT date, due_date, title, contents, place, is_completed, id
@@ -60,7 +60,7 @@ def read_todos(
     FROM todo
     WHERE user_id = %s
     AND date BETWEEN %s AND %s
-    ORDER BY {sort_by};
+    ORDER BY {sort_by} ASC;
     """
 
     last_date_max = datetime.datetime.combine(last_date, datetime.time.max)
@@ -76,17 +76,43 @@ def read_todos(
     return todos
 
 
-def update_todo(conn: MySQLConnection, todo_id: int, todo: todo_schemas.TodoUpdate):
-    cursor = conn.cursor(dictionary=True)
+def update_todo(
+    conn: MySQLConnection,
+    new_todo: todo_schemas.TodoUpdate,
+    todo_id: int,
+):
+    cursor = conn.cursor()
 
     query = """
-    SELECT id, date, title, contents, place, due_date, is_completed
-    FROM todo
-    WHERE user_id = %s;
+    UPDATE todo
+    SET date = %s, due_date = %s, title = %s, contents = %s, place = %s, is_completed = %s
+    WHERE id = %s
     """
 
-    cursor.execute(query)
+    values = (
+        new_todo.date,
+        new_todo.due_date,
+        new_todo.title,
+        new_todo.contents,
+        new_todo.place,
+        new_todo.is_completed,
+        todo_id
+    )
+
+    cursor.execute(query, values)
+
+    conn.commit()
+
+    return get_todo(conn, todo_id)
 
 
 def delete_todo(conn: MySQLConnection, todo_id: int):
-    raise NotImplementedError
+    cursor = conn.cursor()
+
+    query = "DELETE FROM todo WHERE id = %s"
+
+    cursor.execute(query, (todo_id,))
+
+    conn.commit()
+
+
