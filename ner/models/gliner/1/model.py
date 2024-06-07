@@ -37,9 +37,7 @@ from gliner import GLiNER
 from typing import Union, Dict
 
 
-model = GLiNER.from_pretrained("urchade/gliner_multi-v2.1")
-
-
+"""
 def ner(
     text, labels: str, threshold: float, nested_ner: bool
 ) -> Dict[str, Union[str, int, float]]:
@@ -59,19 +57,7 @@ def ner(
             )
         ],
     }
-
-
-class AddSubNet(nn.Module):
-    """
-    Simple AddSub network in PyTorch. This network outputs the sum and
-    subtraction of the inputs.
-    """
-
-    def __init__(self):
-        super(AddSubNet, self).__init__()
-
-    def forward(self, input0, input1):
-        return (input0 + input1), (input0 - input1)
+"""
 
 
 class TritonPythonModel:
@@ -114,7 +100,7 @@ class TritonPythonModel:
         )
 
         # Instantiate the PyTorch model
-        self.add_sub_model = AddSubNet()
+        self.model = GLiNER.from_pretrained("urchade/gliner_multi-v2.1")
 
     def execute(self, requests):
         """`execute` must be implemented in every Python model. `execute`
