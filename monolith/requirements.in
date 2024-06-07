@@ -1,4 +1,5 @@
 fastapi
+pyjwt
 uvicorn[standard]
 gunicorn
 python-multipart
@@ -9,6 +10,7 @@ pydantic-settings
 python-dotenv
 numpy
 mysql-connector-python
+secure
 
 pytest
 pytest-xdist

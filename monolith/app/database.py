@@ -4,7 +4,7 @@ from mysql.connector.connection import MySQLConnection
 from .config import settings
 
 
-def init_todo_db(conn: MySQLConnection):
+def init_db(conn: MySQLConnection):
     cursor = conn.cursor()
     query = """
     CREATE TABLE IF NOT EXISTS todo (
@@ -15,36 +15,6 @@ def init_todo_db(conn: MySQLConnection):
         place VARCHAR(30),
         due_date DATETIME,
         is_completed BOOLEAN,
-        user_id INT
-    )
-    """
-    cursor.execute(query)
-    # cursor.execute("ALTER TABLE todo AUTO_INCREMENT = 1;")
-
-
-def init_challenge_db(conn: MySQLConnection):
-    cursor = conn.cursor()
-    query = """
-    CREATE TABLE IF NOT EXISTS challenge(
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        date DATETIME,
-        due_date DATETIME,
-        title VARCHAR(20),
-        is_completed BOOLEAN,
-        user_id INT
-    )
-    """
-    cursor.execute(query)
-
-
-def init_comment_db(conn: MySQLConnection):
-    cursor = conn.cursor()
-    query = """
-    CREATE TABLE IF NOT EXISTS comment(
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        date DATETIME,
-        contents VARCHAR(30),
-        title VARCHAR(30),
         user_id INT
     )
     """
