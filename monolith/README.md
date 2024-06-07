@@ -1,4 +1,4 @@
-# Stunning Server
+# Stunning Monolith Server
 
 ## Install dependencies
 
