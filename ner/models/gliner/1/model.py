@@ -33,6 +33,33 @@ import json
 import triton_python_backend_utils as pb_utils
 from torch import nn
 
+from gliner import GLiNER
+from typing import Union, Dict
+
+
+model = GLiNER.from_pretrained("urchade/gliner_multi-v2.1")
+
+
+def ner(
+    text, labels: str, threshold: float, nested_ner: bool
+) -> Dict[str, Union[str, int, float]]:
+    labels = labels.split(",")
+    return {
+        "text": text,
+        "entities": [
+            {
+                "entity": entity["label"],
+                "word": entity["text"],
+                "start": entity["start"],
+                "end": entity["end"],
+                "score": 0,
+            }
+            for entity in model.predict_entities(
+                text, labels, flat_ner=not nested_ner, threshold=threshold
+            )
+        ],
+    }
+
 
 class AddSubNet(nn.Module):
     """
